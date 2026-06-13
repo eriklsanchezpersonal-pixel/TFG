@@ -19,6 +19,7 @@ public class Duenio {
         this.contrasena = contrasena;
     }
 
+
     public int getId_dueno() { return id_dueno; }
     public void setId_dueno(int id_dueno) { this.id_dueno = id_dueno; }
     public String getNombre() { return nombre; }

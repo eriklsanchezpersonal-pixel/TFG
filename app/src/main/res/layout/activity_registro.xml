@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F7FA">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Crear Cuenta"
+                android:textColor="#2C3E50"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Únete a NutriPet y gestiona sus menús"
+                android:textColor="#7F8C8D"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:layout_marginBottom="24dp"/>
+
+            <EditText
+                android:id="@+id/etRegNombre"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Nombre completo"
+                android:inputType="textPersonName"
+                android:background="@android:drawable/edit_text"
+                android:paddingLeft="12dp"
+                android:layout_marginBottom="16dp"
+                android:textSize="16sp"/>
+
+            <EditText
+                android:id="@+id/etRegTelefono"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Teléfono de contacto"
+                android:inputType="phone"
+                android:background="@android:drawable/edit_text"
+                android:paddingLeft="12dp"
+                android:layout_marginBottom="16dp"
+                android:textSize="16sp"/>
+
+            <EditText
+                android:id="@+id/etRegCorreo"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Correo electrónico"
+                android:inputType="textEmailAddress"
+                android:background="@android:drawable/edit_text"
+                android:paddingLeft="12dp"
+                android:layout_marginBottom="16dp"
+                android:textSize="16sp"/>
+
+            <EditText
+                android:id="@+id/etRegContrasena"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Contraseña"
+                android:inputType="textPassword"
+                android:background="@android:drawable/edit_text"
+                android:paddingLeft="12dp"
+                android:layout_marginBottom="24dp"
+                android:textSize="16sp"/>
+
+            <Button
+                android:id="@+id/btnRegistrarUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="REGISTRARME"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:backgroundTint="#2E7D32"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:id="@+id/tvVolverALogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="¿Ya tienes cuenta? Inicia sesión"
+                android:textColor="#1565C0"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:padding="8dp"/>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
