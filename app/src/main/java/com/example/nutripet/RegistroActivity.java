@@ -19,10 +19,10 @@ public class RegistroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro);
 
-        // Inicializar la base de datos local
+        //Inicializar la base de datos local
         db = AppBaseDeDatos.getInstance(this);
 
-        // Vincular los componentes del XML con Java (Añadido el teléfono)
+        //Vincular los componentes del XML con Java (Añadido el teléfono)
         etNombre = findViewById(R.id.etRegNombre);
         etTelefono = findViewById(R.id.etRegTelefono);
         etCorreo = findViewById(R.id.etRegCorreo);
@@ -30,20 +30,20 @@ public class RegistroActivity extends AppCompatActivity {
         btnRegistrar = findViewById(R.id.btnRegistrarUsuario);
         tvVolverALogin = findViewById(R.id.tvVolverALogin);
 
-        // Acción al pulsar el botón "REGISTRARME"
+        //Acción al pulsar el botón "REGISTRARME"
         btnRegistrar.setOnClickListener(v -> {
             String nombre = etNombre.getText().toString().trim();
             String telefono = etTelefono.getText().toString().trim();
             String correo = etCorreo.getText().toString().trim();
             String contrasena = etContrasena.getText().toString().trim();
 
-            // Validación de todos los campos, incluyendo teléfono
+            //Validación de todos los campos, incluyendo teléfono
             if (nombre.isEmpty() || telefono.isEmpty() || correo.isEmpty() || contrasena.isEmpty()) {
                 Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Crear el objeto Duenio con los datos introducidos
+            //Crear el objeto Duenio con los datos introducidos
             Duenio nuevoDuenio = new Duenio(nombre,correo,telefono,contrasena);
 
             try {
@@ -61,7 +61,7 @@ public class RegistroActivity extends AppCompatActivity {
             }
         });
 
-        // Acción para volver al Login sin registrar nada
+        //Acción para volver al Login sin registrar nada
         tvVolverALogin.setOnClickListener(v -> finish());
     }
 }

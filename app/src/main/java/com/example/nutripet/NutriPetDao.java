@@ -40,4 +40,15 @@ public interface NutriPetDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void precargarIngredientes(List<Ingrediente> ingredientes);
+
+    @Query("SELECT * FROM Mascota WHERE id_dueno = :idDuenio")
+    List<Mascota> obtenerMascotasPorDuenio(int idDuenio);
+
+    //--- INSERTAR MASCOTA ---
+    @Insert
+    long registrarMascota(Mascota mascota);
+
+    //--- INSERTAR RELACIÓN MASCOTA-PATOLOGÍA ---
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertarMascotaPatologia(MascotaPatologia mascotaPatologia);
 }

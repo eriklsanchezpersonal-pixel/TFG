@@ -44,13 +44,20 @@ public class LoginActivity extends AppCompatActivity {
 
             if (duenio != null) {
                 Toast.makeText(this, "¡Bienvenido " + duenio.getNombre() + "!", Toast.LENGTH_SHORT).show();
-                // Aquí abriríamos la pantalla principal de mascotas más adelante
+
+                //Redirigir a la pantalla principal de mascotas
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                //Pasamos el ID del dueño a la siguiente pantalla para saber de quién son los perros
+                intent.putExtra("ID_DUENO", duenio.getId_dueno());
+                startActivity(intent);
+                finish(); //Cerramos el login para que si el usuario pulsa "atrás" no vuelva a pedir credenciales
+
             } else {
                 Toast.makeText(this, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Acción para saltar a la pantalla de Registro
+        //Acción para saltar a la pantalla de Registro
         tvIrARegistro.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegistroActivity.class);
             startActivity(intent);
