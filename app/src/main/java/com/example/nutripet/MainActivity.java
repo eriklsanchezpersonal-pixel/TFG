@@ -2,19 +2,19 @@ package com.example.nutripet;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private RecyclerView rvMascotas;
-    private TextView tvSinMascotas;
     private FloatingActionButton fabAnadirMascota;
+    private RecyclerView rvMascotas;
+    private MascotaAdapter mascotaAdapter;
     private AppBaseDeDatos db;
     private int idDuenioLogueado;
 
@@ -23,47 +23,67 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Inicializamos el acceso a la base de datos de Room
         db = AppBaseDeDatos.getInstance(this);
 
-        //Recuperamos el ID del dueño que pasamos desde el LoginActivity
+        // Recuperamos el ID del dueño enviado desde el LoginActivity
         idDuenioLogueado = getIntent().getIntExtra("ID_DUENIO", -1);
 
-        //Vinculamos las vistas
-        rvMascotas = findViewById(R.id.rvMascotas);
-        tvSinMascotas = findViewById(R.id.tvSinMascotas);
+        // Vincular componentes del layout
         fabAnadirMascota = findViewById(R.id.fabAnadirMascota);
+        rvMascotas = findViewById(R.id.rvMascotas);
 
+        // Configurar la orientación del RecyclerView
         rvMascotas.setLayoutManager(new LinearLayoutManager(this));
 
-        //Configuramos el botón para añadir nueva mascota
+        // Inicializar el adaptador con una lista vacía para evitar errores de referencia
+        mascotaAdapter = new MascotaAdapter(new ArrayList<>(), this);
+        rvMascotas.setAdapter(mascotaAdapter);
+
+        // Configurar la acción del botón "+"
         fabAnadirMascota.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, AltaMascotaActivity.class);
-            // Usamos la clave estandarizada sin "I" al final para evitar pérdidas de ID
-            intent.putExtra("ID_DUENO", idDuenioLogueado);
+            // Pasamos el ID del dueño verificado de forma estricta (ej: 3)
+            intent.putExtra("ID_DUENIO", idDuenioLogueado);
             startActivity(intent);
         });
     }
 
+    /**
+     * El método onResume se dispara AUTOMÁTICAMENTE cada vez que el usuario
+     * regresa a esta pantalla. Aquí hacemos la recarga en segundo plano.
+     */
     @Override
     protected void onResume() {
         super.onResume();
-        //Cada vez que volvamos a esta pantalla por ejemplo, tras guardar una mascota, refrescamos la lista
-        cargarMascotas();
+
+        // Si el ID del dueño es válido, cargamos o refrescamos la lista
+        if (idDuenioLogueado != -1) {
+            cargarMascotasDesdeBD();
+        } else {
+            Toast.makeText(this, "Error: Sesión de usuario no válida", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void cargarMascotas() {
-        //Obtenemos las mascotas asignadas a este dueño desde el DAO
-        //OJO: Asegúrate de tener este método en tu NutriPetDao, si cambia el nombre adáptalo
-        List<Mascota> listaMascotas = db.nutriPetDao().obtenerMascotasPorDuenio(idDuenioLogueado);
+    /**
+     * Consulta las mascotas del dueño en un hilo secundario y actualiza el RecyclerView
+     */
+    private void cargarMascotasDesdeBD() {
+        new Thread(() -> {
+            try {
+                // Buscamos en Room solo las mascotas que pertenecen a este dueño
+                final List<Mascota> listaActualizada = db.nutriPetDao().obtenerMascotasPorDuenio(idDuenioLogueado);
 
-        if (listaMascotas == null || listaMascotas.isEmpty()) {
-            tvSinMascotas.setVisibility(View.VISIBLE);
-            rvMascotas.setVisibility(View.GONE);
-        } else {
-            tvSinMascotas.setVisibility(View.GONE);
-            rvMascotas.setVisibility(View.VISIBLE);
-
-            // Aquí más adelante le asignaremos un Adaptador (Adapter) para pintarlas en tarjetas bonitas
-        }
+                // Volvemos al hilo de la interfaz (UI Thread) para pintar los cambios
+                runOnUiThread(() -> {
+                    if (listaActualizada != null) {
+                        // Pasamos los nuevos datos al adaptador para que repinte la lista
+                        mascotaAdapter.updateList(listaActualizada);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }
