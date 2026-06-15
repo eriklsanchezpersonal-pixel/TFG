@@ -1,10 +1,13 @@
 package com.example.nutripet;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "Duenio")
-public class Duenio {
+@Entity(
+        tableName = "Duenio",
+        indices = {@Index(value = {"email"}, unique = true)} // 🌟 Fuerza a que no haya correos idénticos
+)public class Duenio {
     @PrimaryKey(autoGenerate = true)
     private int id_dueno;
     private String nombre;

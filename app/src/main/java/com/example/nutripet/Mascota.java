@@ -3,13 +3,20 @@ package com.example.nutripet;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "Mascota",
-        foreignKeys = @ForeignKey(entity = Duenio.class,
+
+@Entity(
+        tableName = "Mascota",
+        foreignKeys = @ForeignKey(
+                entity = Duenio.class,
                 parentColumns = "id_dueno",
                 childColumns = "id_dueno",
-                onDelete = ForeignKey.CASCADE))
+                onDelete = ForeignKey.CASCADE
+        ),
+        indices = {@Index(value = {"id_dueno"})} // 🌟 AÑADE ESTA LÍNEA AQUÍ
+)
 public class Mascota {
     @PrimaryKey
     @NonNull

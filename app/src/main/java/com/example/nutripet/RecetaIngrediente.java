@@ -2,19 +2,32 @@ package com.example.nutripet;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 
-@Entity(tableName = "Receta_Ingrediente",
+@Entity(
+        tableName = "Receta_Ingrediente",
         primaryKeys = {"id_receta", "id_ingrediente"},
         foreignKeys = {
-                @ForeignKey(entity = Receta.class,
+                @ForeignKey(
+                        entity = Receta.class,
                         parentColumns = "id_receta",
                         childColumns = "id_receta",
-                        onDelete = ForeignKey.CASCADE),
-                @ForeignKey(entity = Ingrediente.class,
+                        onDelete = ForeignKey.CASCADE
+                ),
+                @ForeignKey(
+                        entity = Ingrediente.class,
                         parentColumns = "id_ingrediente",
                         childColumns = "id_ingrediente",
-                        onDelete = ForeignKey.CASCADE)
-        })
+                        onDelete = ForeignKey.CASCADE
+                )
+        },
+        // 🌟 Añadimos la coma que faltaba arriba y creamos los índices para ambas columnas
+        indices = {
+                @Index(value = {"id_receta"}),
+                @Index(value = {"id_ingrediente"})
+        }
+)
+
 public class RecetaIngrediente {
     private int id_receta;
     private int id_ingrediente;

@@ -51,4 +51,25 @@ public interface NutriPetDao {
     //--- INSERTAR RELACIÓN MASCOTA-PATOLOGÍA ---
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertarMascotaPatologia(MascotaPatologia mascotaPatologia);
+
+    //Obtener informacion de un dueño
+    @Query("SELECT * FROM Duenio WHERE id_dueno = :id")
+    Duenio obtenerDuenioPorId(int id);
+
+    //Sentencias para borrado de prueba
+    @Query("DELETE FROM Duenio")
+    void borrarTodosLosDuenios();
+
+    @Query("DELETE FROM Mascota")
+    void borrarTodasLasMascotas();
+
+    //Obtener los datos básicos de una mascota usando su microchip
+    @Query("SELECT * FROM Mascota WHERE microchip = :microchip")
+    Mascota obtenerMascotaPorMicrochip(String microchip);
+
+    //Obtener el nombre de la patología que tiene asignada una mascota
+    @Query("SELECT P.nombre_patologia FROM Patologia P " +
+            "INNER JOIN Mascota_Patologia MP ON P.id_patologia = MP.id_patologia " +
+            "WHERE MP.id_mascota = :microchip LIMIT 1")
+    String obtenerPatologiaDeMascota(String microchip);
 }

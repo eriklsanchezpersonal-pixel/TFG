@@ -17,19 +17,20 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Inicializamos la base de datos
+        //Inicializamos la base de datos
         db = AppBaseDeDatos.getInstance(this);
 
-        // Vinculamos componentes de la interfaz XML
+        //Vinculamos componentes de la interfaz XML
         etCorreo = findViewById(R.id.etLoginCorreo);
         etContrasena = findViewById(R.id.etLoginContrasena);
         btnIngresar = findViewById(R.id.btnIngresar);
         tvIrARegistro = findViewById(R.id.tvIrARegistro);
 
-        // Acción al pulsar el botón INGRESAR
+        //Acción al pulsar el botón INGRESAR
         btnIngresar.setOnClickListener(v -> {
             String correo = etCorreo.getText().toString().trim();
             String contrasena = etContrasena.getText().toString().trim();
@@ -39,25 +40,25 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            // 🌟 CORRECCIÓN CRUCIAL: Trasladamos la consulta de Room a un hilo secundario
+            //Trasladamos la consulta de Room a un hilo secundario
             new Thread(() -> {
                 try {
                     // Validamos las credenciales de forma segura fuera del hilo principal
                     final Duenio duenio = db.nutriPetDao().login(correo, contrasena);
 
-                    // Volvemos al hilo de la interfaz (UI Thread) para gestionar las respuestas y cambiar de pantalla
+                    //Volvemos al hilo de la interfaz (UI Thread) para gestionar las respuestas y cambiar de pantalla
                     runOnUiThread(() -> {
                         if (duenio != null) {
                             Toast.makeText(LoginActivity.this, "¡Bienvenido " + duenio.getNombre() + "!", Toast.LENGTH_SHORT).show();
 
-                            // Redirigir a la pantalla principal de mascotas
+                            //Redirigir a la pantalla principal de mascotas
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 
-                            // Pasamos el ID del dueño verificado de forma segura
+                            //Pasamos el ID del dueño verificado de forma segura
                             intent.putExtra("ID_DUENIO", duenio.getId_dueno());
                             startActivity(intent);
 
-                            finish(); // Cerramos el login de forma definitiva
+                            finish(); //Cerramos el login de forma definitiva
                         } else {
                             Toast.makeText(LoginActivity.this, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show();
                         }

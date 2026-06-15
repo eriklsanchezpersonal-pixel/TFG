@@ -25,6 +25,9 @@
 
         <activity android:name=".AltaMascotaActivity" android:exported="false" />
 
+        <activity android:name=".PerfilUsuarioActivity" android:exported="false" />
+
+        <activity android:name=".DetalleMascotaActivity" android:exported="false" />
     </application>
 
 </manifest>

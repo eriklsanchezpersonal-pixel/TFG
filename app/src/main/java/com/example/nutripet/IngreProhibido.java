@@ -2,19 +2,30 @@ package com.example.nutripet;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 
-@Entity(tableName = "Ingre_Prohibido",
+@Entity(
+        tableName = "Ingre_Prohibido",
         primaryKeys = {"id_ingrediente", "id_patologia"},
         foreignKeys = {
-                @ForeignKey(entity = Ingrediente.class,
+                @ForeignKey(
+                        entity = Ingrediente.class,
                         parentColumns = "id_ingrediente",
                         childColumns = "id_ingrediente",
-                        onDelete = ForeignKey.CASCADE),
-                @ForeignKey(entity = Patologia.class,
+                        onDelete = ForeignKey.CASCADE
+                ),
+                @ForeignKey(
+                        entity = Patologia.class,
                         parentColumns = "id_patologia",
                         childColumns = "id_patologia",
-                        onDelete = ForeignKey.CASCADE)
-        })
+                        onDelete = ForeignKey.CASCADE
+                )
+        },
+        indices = {
+                @Index(value = {"id_ingrediente"}),
+                @Index(value = {"id_patologia"})
+        }
+)
 public class IngreProhibido {
     private int id_ingrediente;
     private int id_patologia;

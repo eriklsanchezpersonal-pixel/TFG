@@ -3,19 +3,31 @@ package com.example.nutripet;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 
-@Entity(tableName = "Mascota_Patologia",
+@Entity(
+        tableName = "Mascota_Patologia",
         primaryKeys = {"id_mascota", "id_patologia"},
         foreignKeys = {
-                @ForeignKey(entity = Mascota.class,
+                @ForeignKey(
+                        entity = Mascota.class,
                         parentColumns = "microchip",
                         childColumns = "id_mascota",
-                        onDelete = ForeignKey.CASCADE),
-                @ForeignKey(entity = Patologia.class,
+                        onDelete = ForeignKey.CASCADE
+                ),
+                @ForeignKey(
+                        entity = Patologia.class,
                         parentColumns = "id_patologia",
                         childColumns = "id_patologia",
-                        onDelete = ForeignKey.CASCADE)
-        })
+                        onDelete = ForeignKey.CASCADE
+                )
+        },
+        indices = {
+                @Index(value = {"id_mascota"}),
+                @Index(value = {"id_patologia"})
+        }
+)
+
 public class MascotaPatologia {
     @NonNull
     private String id_mascota;

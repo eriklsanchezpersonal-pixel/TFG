@@ -23,14 +23,22 @@ public class AltaMascotaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.actividad_alta_mascota);
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbarAlta);
 
-        // Inicializar la base de datos
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
+        //Inicializar la base de datos
         db = AppBaseDeDatos.getInstance(this);
 
-        // Recuperar el ID del dueño enviado desde la actividad anterior
+        //Recuperar el ID del dueño enviado desde la actividad anterior
         idDueno = getIntent().getIntExtra("ID_DUENIO", -1);
 
-        // Vincular componentes de la interfaz
+        //Vincular componentes de la interfaz
         etMicrochip = findViewById(R.id.etMicrochipMascota);
         etNombre = findViewById(R.id.etNombreMascota);
         etFechaNacimiento = findViewById(R.id.etFechaNacimientoMascota);
@@ -39,15 +47,15 @@ public class AltaMascotaActivity extends AppCompatActivity {
         spPatologias = findViewById(R.id.spPatologias);
         btnGuardar = findViewById(R.id.btnGuardarMascota);
 
-        // Cargar los datos de los selectores (Spinners)
+        //Cargar los datos de los selectores (Spinners)
         configurarSpinners();
 
-        // Configurar el evento del botón de registro
+        //Configurar el evento del botón de registro
         btnGuardar.setOnClickListener(v -> guardarMascota());
     }
 
     private void configurarSpinners() {
-        // 1. Configurar Spinner de Nivel de Actividad (Opciones fijas)
+        //Configurar Spinner de Nivel de Actividad (Opciones fijas)
         List<String> opcionesActividad = new ArrayList<>();
         opcionesActividad.add("Bajo (Poco ejercicio / Senior)");
         opcionesActividad.add("Moderado (Paseos diarios normales)");
@@ -58,7 +66,7 @@ public class AltaMascotaActivity extends AppCompatActivity {
         adapterActividad.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spNivelActividad.setAdapter(adapterActividad);
 
-        // 2. Configurar Spinner de Patologías cargando los datos desde Room en un hilo secundario
+        //Configurar Spinner de Patologías cargando los datos desde Room en un hilo secundario
         new Thread(() -> {
             try {
                 listaPatologias = db.nutriPetDao().obtenerTodasLasPatologias();
@@ -88,13 +96,19 @@ public class AltaMascotaActivity extends AppCompatActivity {
         String pesoStr = etPeso.getText().toString().trim();
         String nivelActividad = spNivelActividad.getSelectedItem().toString();
 
-        // Validar que los campos de texto no estén vacíos
+        //Validar que los campos de texto no estén vacíos
         if (microchip.isEmpty() || nombre.isEmpty() || fechaNac.isEmpty() || pesoStr.isEmpty()) {
             Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Validar que las patologías de la base de datos hayan terminado de cargar
+        //Validar que el microchip contenga solo números
+        if (!microchip.matches("^[0-9]+$")) {
+            etMicrochip.setError("El microchip solo puede contener números");
+            return;
+        }
+
+        //Validar que las patologías de la base de datos hayan terminado de cargar
         if (listaPatologias == null || listaPatologias.isEmpty()) {
             Toast.makeText(this, "Cargando catálogo de patologías. Inténtalo de nuevo.", Toast.LENGTH_SHORT).show();
             return;
@@ -106,10 +120,7 @@ public class AltaMascotaActivity extends AppCompatActivity {
         int posicionSeleccionada = spPatologias.getSelectedItemPosition();
         int idPatologiaDetectado = listaPatologias.get(posicionSeleccionada).getId_patologia();
 
-        // 🌟 MENSAJE DE DIAGNÓSTICO: Te mostrará en pantalla qué IDs se procesan antes del fallo
-        Toast.makeText(this, "DEBUG -> ID Dueño: " + idDueno + " | ID Patología: " + idPatologiaDetectado, Toast.LENGTH_LONG).show();
-
-        // Crear la entidad Mascota con el ID del dueño
+        //Crear la entidad Mascota con el ID del dueño
         Mascota nuevaMascota = new Mascota(
                 microchip,
                 nombre,
@@ -119,7 +130,7 @@ public class AltaMascotaActivity extends AppCompatActivity {
                 idDueno
         );
 
-        // Operaciones de inserción en segundo plano
+        //Operaciones de inserción en segundo plano
         new Thread(() -> {
             try {
                 // 1. Insertar la mascota en la base de datos
@@ -135,13 +146,26 @@ public class AltaMascotaActivity extends AppCompatActivity {
                     finish();
                 });
 
-            } catch (Exception e) {
-                // Si la clave foránea falla, aquí veremos el motivo exacto en pantalla
+            } catch (android.database.sqlite.SQLiteConstraintException e) {
+                // 🚨 Cambiado: Aquí saltará SÓLO si el número de microchip está repetido en la base de datos
                 runOnUiThread(() -> {
-                    Toast.makeText(AltaMascotaActivity.this, "Error BD: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    etMicrochip.setError("Este número de microchip ya está registrado");
+                    Toast.makeText(AltaMascotaActivity.this, "Error: El microchip ya existe", Toast.LENGTH_LONG).show();
+                });
+            } catch (Exception e) {
+                // Para cualquier otro error genérico del sistema
+                runOnUiThread(() -> {
+                    Toast.makeText(AltaMascotaActivity.this, "Error inesperado: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    //Método que se ejecuta si damos a la flecha de dar atrás
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Cierra esta actividad y nos devuelve automáticamente al MainActivity
+        return true;
     }
 }
