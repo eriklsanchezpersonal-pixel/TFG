@@ -26,13 +26,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Inicializamos el acceso a la base de datos de Room
+        //Inicializamos el acceso a la base de datos de Room
         db = AppBaseDeDatos.getInstance(this);
 
-        // Recuperamos el ID del dueño enviado desde el LoginActivity
+        //Recuperamos el ID del dueño enviado desde el LoginActivity
         idDuenioLogueado = getIntent().getIntExtra("ID_DUENIO", -1);
 
-        // Vincular componentes del layout
+        //Vinculamos componentes del layout
         fabAnadirMascota = findViewById(R.id.fabAnadirMascota);
         rvMascotas = findViewById(R.id.rvMascotas);
         tvListaVacia = findViewById(R.id.tvListaVacia);
@@ -41,12 +41,11 @@ public class MainActivity extends AppCompatActivity {
         // Configurar la orientación del RecyclerView
         rvMascotas.setLayoutManager(new LinearLayoutManager(this));
 
-        //Inicializamos el adaptador pasándole la acción del clic como segundo o tercer parámetro
-        // Nota: Si tu constructor actual de MascotaAdapter solo acepta (lista, contexto), mira el recuadro de abajo.
+        //Inicializamos el adaptador pasándole la lista vacía y el contexto (this)
         mascotaAdapter = new MascotaAdapter(new ArrayList<>(), this);
         rvMascotas.setAdapter(mascotaAdapter);
 
-        // Configurar la acción del botón "+"
+        //Configuramos la acción del botón "+"
         fabAnadirMascota.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, AltaMascotaActivity.class);
             intent.putExtra("ID_DUENIO", idDuenioLogueado);
@@ -73,7 +72,17 @@ public class MainActivity extends AppCompatActivity {
     private void cargarMascotasDesdeBD() {
         new Thread(() -> {
             try {
+                // Buscamos en Room las mascotas de este dueño
                 final List<Mascota> listaActualizada = db.nutriPetDao().obtenerMascotasPorDuenio(idDuenioLogueado);
+
+                // Rellenamos la patología temporal de cada mascota desde Room
+                if (listaActualizada != null) {
+                    for (Mascota m : listaActualizada) {
+                        String patologia = db.nutriPetDao().obtenerPatologiaDeMascota(m.getMicrochip());
+                        // Si no tiene patología asignada, le ponemos que está sano
+                        m.setNombrePatologia(patologia != null && !patologia.isEmpty() ? patologia : "Sano / Ninguna");
+                    }
+                }
 
                 runOnUiThread(() -> {
                     if (listaActualizada != null && !listaActualizada.isEmpty()) {

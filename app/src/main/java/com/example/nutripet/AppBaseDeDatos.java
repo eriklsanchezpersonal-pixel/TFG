@@ -20,7 +20,8 @@ import java.util.concurrent.Executors;
         Receta.class,
         MascotaPatologia.class,
         IngreProhibido.class,
-        RecetaIngrediente.class
+        RecetaIngrediente.class,
+        MascotaReceta.class // 🌟 Añade esta línea aquí
 }, version = 1, exportSchema = false)
 public abstract class AppBaseDeDatos extends RoomDatabase {
 
@@ -144,52 +145,51 @@ public abstract class AppBaseDeDatos extends RoomDatabase {
 
 
                 // =========================================================================
-                // COMPOSICIÓN NUTRICIONAL DE CADA RECETA (Tabla puente: Receta_Ingredi)
+                // COMPOSICIÓN NUTRICIONAL DE CADA RECETA (Tabla puente corregida: Receta_Ingrediente)
                 // =========================================================================
                 // Receta 1 (Pollo y Arroz)
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (1, 1, 150.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (1, 8, 100.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (1, 1, 150.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (1, 8, 100.0)");
 
                 // Receta 2 (Estofado Ternera)
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (2, 3, 120.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (2, 13, 40.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (2, 14, 50.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (2, 3, 120.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (2, 13, 40.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (2, 14, 50.0)");
 
                 // Receta 3 (Plato Renal de Merluza)
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (3, 6, 100.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (3, 10, 80.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (3, 15, 60.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (3, 6, 100.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (3, 10, 80.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (3, 15, 60.0)");
 
-                // Receta 4 (Pollo Fitness - Obesidad): Muslo pollo (ID 2 -> 100g), Calabacín (ID 15 -> 120g), Judías (ID 16 -> 60g)
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (4, 2, 100.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (4, 15, 120.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (4, 16, 60.0)");
+                // Receta 4 (Pollo Fitness - Obesidad)
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (4, 2, 100.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (4, 15, 120.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (4, 16, 60.0)");
 
-                // Receta 5 (Merluza Ligera - Obesidad): Merluza (ID 6 -> 120g), Calabaza (ID 14 -> 100g), Aceite Oliva (ID 19 -> 5g)
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (5, 6, 120.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (5, 14, 100.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (5, 19, 5.0)");
+                // Receta 5 (Merluza Ligera - Obesidad)
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (5, 6, 120.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (5, 14, 100.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (5, 19, 5.0)");
 
-                // Receta 6 (Pollo Renal - Renal): Pechuga pollo (ID 1 -> 80g), Patata (ID 10 -> 120g), Manzana (ID 17 -> 50g)
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (6, 1, 80.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (6, 10, 120.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (6, 17, 50.0)");
+                // Receta 6 (Pollo Renal - Renal)
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (6, 1, 80.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (6, 10, 120.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (6, 17, 50.0)");
 
-                // Receta 7 (Arroz con Huevo - Renal): Arroz Blanco (ID 8 -> 130g), Huevo (ID 20 -> 50g), Aceite Salmón (ID 18 -> 8g)
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (7, 8, 130.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (7, 20, 50.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (7, 18, 8.0)");
+                // Receta 7 (Arroz con Huevo - Renal)
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (7, 8, 130.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (7, 20, 50.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (7, 18, 8.0)");
 
-                // Receta 8 (Ternera Diabetes - Diabetes): Ternera magra (ID 3 -> 120g), Boniato (ID 11 -> 80g), Judías (ID 16 -> 80g)
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (8, 3, 120.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (8, 11, 80.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (8, 16, 80.0)");
+                // Receta 8 (Ternera Diabetes - Diabetes)
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (8, 3, 120.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (8, 11, 80.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (8, 16, 80.0)");
 
-                // Receta 9 (Salmón Diabetes - Diabetes): Salmón (ID 5 -> 100g), Avena (ID 12 -> 80g), Zanahoria (ID 13 -> 60g)
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (9, 5, 100.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (9, 12, 80.0)");
-                db.execSQL("INSERT INTO Receta_Ingredi (id_receta, id_ingrediente, cantidad_gramos) VALUES (9, 13, 60.0)");
-            });
+                // Receta 9 (Salmón Diabetes - Diabetes)
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (9, 5, 100.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (9, 12, 80.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (9, 13, 60.0)");            });
         }
     };
 }

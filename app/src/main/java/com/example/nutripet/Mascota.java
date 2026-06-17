@@ -3,9 +3,9 @@ package com.example.nutripet;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore; // 🌟 Asegúrate de que se importe esto
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
-
 
 @Entity(
         tableName = "Mascota",
@@ -15,7 +15,7 @@ import androidx.room.PrimaryKey;
                 childColumns = "id_dueno",
                 onDelete = ForeignKey.CASCADE
         ),
-        indices = {@Index(value = {"id_dueno"})} // 🌟 AÑADE ESTA LÍNEA AQUÍ
+        indices = {@Index(value = {"id_dueno"})}
 )
 public class Mascota {
     @PrimaryKey
@@ -26,6 +26,9 @@ public class Mascota {
     private float peso_actual;
     private String nivel_actividad;
     private int id_dueno;
+
+    @Ignore
+    private String nombrePatologia;
 
     public Mascota(@NonNull String microchip, String nombre, String fecha_nacimiento, float peso_actual, String nivel_actividad, int id_dueno) {
         this.microchip = microchip;
@@ -49,4 +52,7 @@ public class Mascota {
     public void setNivel_actividad(String nivel_actividad) { this.nivel_actividad = nivel_actividad; }
     public int getId_dueno() { return id_dueno; }
     public void setId_dueno(int id_dueno) { this.id_dueno = id_dueno; }
+
+    public String getNombrePatologia() { return nombrePatologia; }
+    public void setNombrePatologia(String nombrePatologia) { this.nombrePatologia = nombrePatologia; }
 }

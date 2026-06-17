@@ -33,6 +33,17 @@ public interface NutriPetDao {
 
     @Query("SELECT * FROM Ingrediente")
     List<Ingrediente> obtenerTodosLosIngredientes();
+    @Query("SELECT * FROM Receta")
+    List<Receta> obtenerTodasLasRecetas();
+    @Query("SELECT COUNT(*) FROM Ingre_Prohibido " +
+            "INNER JOIN Ingrediente ON Ingre_Prohibido.id_ingrediente = Ingrediente.id_ingrediente " +
+            "INNER JOIN Patologia ON Ingre_Prohibido.id_patologia = Patologia.id_patologia " +
+            "WHERE LOWER(Ingrediente.nombre) = LOWER(:nombreIngrediente) " +
+            "AND LOWER(:patologiaMascota) LIKE '%' || LOWER(Patologia.nombre_patologia) || '%'")
+    int esIngredienteProhibido(String nombreIngrediente, String patologiaMascota);
+
+    @Query("SELECT nombre FROM Ingrediente INNER JOIN Receta_Ingrediente ON Ingrediente.id_ingrediente = Receta_Ingrediente.id_ingrediente WHERE Receta_Ingrediente.id_receta = :idReceta")
+    List<String> obtenerIngredientesDeReceta(int idReceta);
 
     // --- MÉTODOS INTERNOS (Para que la App precargue los datos al instalarse) ---
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -72,4 +83,20 @@ public interface NutriPetDao {
             "INNER JOIN Mascota_Patologia MP ON P.id_patologia = MP.id_patologia " +
             "WHERE MP.id_mascota = :microchip LIMIT 1")
     String obtenerPatologiaDeMascota(String microchip);
+    @Query("SELECT R.* FROM Receta R " +
+            "INNER JOIN Mascota_Receta MR ON R.id_receta = MR.id_receta " +
+            "WHERE MR.id_mascota = :microchip LIMIT 1")
+    Receta obtenerRecetaDeMascota(String microchip);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void asignarRecetaAMascota(MascotaReceta mascotaReceta);
+
+    @Query("SELECT R.* FROM Receta R " +
+            "INNER JOIN Mascota_Receta MR ON R.id_receta = MR.id_receta " +
+            "WHERE MR.id_mascota = :microchip")
+    List<Receta> obtenerRecetasAsignadasAMascota(String microchip);
+
+    @Query("SELECT * FROM Receta WHERE id_receta = :id")
+    Receta obtenerRecetaPorId(int id);
+
 }

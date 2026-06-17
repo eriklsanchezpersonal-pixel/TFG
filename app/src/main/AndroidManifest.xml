@@ -28,6 +28,10 @@
         <activity android:name=".PerfilUsuarioActivity" android:exported="false" />
 
         <activity android:name=".DetalleMascotaActivity" android:exported="false" />
+
+        <activity android:name=".RecomendadorDietaActivity" android:exported="false" />
+
+        <activity android:name=".DetalleRecetaActivity" />
     </application>
 
 </manifest>

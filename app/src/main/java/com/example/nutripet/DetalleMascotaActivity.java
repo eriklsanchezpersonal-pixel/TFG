@@ -1,14 +1,20 @@
 package com.example.nutripet;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
 
 public class DetalleMascotaActivity extends AppCompatActivity {
 
     private TextView tvNombre, tvMicrochip, tvFecha, tvPeso, tvActividad, tvPatologia, tvTitulo;
+    private RecyclerView rvRecetasAsignadas; // 🌟 Declarado
     private Button btnVerDieta;
     private AppBaseDeDatos db;
     private String microchipMascota;
@@ -18,17 +24,13 @@ public class DetalleMascotaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalle_mascota);
 
-        //Configurar la Toolbar superior
         Toolbar toolbar = findViewById(R.id.toolbarDetalle);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
         db = AppBaseDeDatos.getInstance(this);
-
-        //Recuperamos el microchip de la mascota que el usuario pulsó en la lista
         microchipMascota = getIntent().getStringExtra("MICROCHIP_MASCOTA");
 
         // Vincular componentes
@@ -41,30 +43,41 @@ public class DetalleMascotaActivity extends AppCompatActivity {
         tvPatologia = findViewById(R.id.tvDetallePatologia);
         btnVerDieta = findViewById(R.id.btnVerDieta);
 
-        //Cargar los datos desde Room
-        cargarDatosMascota();
+        rvRecetasAsignadas = findViewById(R.id.rvRecetasAsignadas);
+        rvRecetasAsignadas.setLayoutManager(new LinearLayoutManager(this));
 
-        //Acción del botón de la dieta
+        // Cargar datos
+        cargarDatosMascota();
+        cargarRecetasAsignadas();
+
         btnVerDieta.setOnClickListener(v -> {
-            //Aquí meteremos la lógica de las dietas en el siguiente paso
+            Intent intent = new Intent(DetalleMascotaActivity.this, RecomendadorDietaActivity.class);
+            intent.putExtra("MICROCHIP_MASCOTA", microchipMascota);
+            intent.putExtra("PATOLOGIA_MASCOTA", tvPatologia.getText().toString());
+            startActivity(intent);
         });
+    }
+
+    private void cargarRecetasAsignadas() {
+        new Thread(() -> {
+            List<Receta> recetas = db.nutriPetDao().obtenerRecetasAsignadasAMascota(microchipMascota);
+
+            runOnUiThread(() -> {
+                // Pasamos null al listener porque aquí solo queremos mostrar la lista
+                RecetaAdapter adapter = new RecetaAdapter(recetas, null);
+                rvRecetasAsignadas.setAdapter(adapter);
+            });
+        }).start();
     }
 
     private void cargarDatosMascota() {
         new Thread(() -> {
-            //Buscamos los datos básicos de la mascota
             Mascota mascota = db.nutriPetDao().obtenerMascotaPorMicrochip(microchipMascota);
-
-            //Buscamos el nombre de su patología a través de la tabla intermedia
             String nombrePatologia = db.nutriPetDao().obtenerPatologiaDeMascota(microchipMascota);
 
             runOnUiThread(() -> {
                 if (mascota != null) {
-                    // Cambiamos el título de la barra por el nombre de la mascota
-                    if (getSupportActionBar() != null) {
-                        getSupportActionBar().setTitle("Perfil de " + mascota.getNombre());
-                    }
-
+                    if (getSupportActionBar() != null) getSupportActionBar().setTitle("Perfil de " + mascota.getNombre());
                     tvNombre.setText("Nombre: " + mascota.getNombre());
                     tvMicrochip.setText("Microchip: " + mascota.getMicrochip());
                     tvFecha.setText("Fecha Nacimiento: " + mascota.getFecha_nacimiento());
@@ -75,7 +88,6 @@ public class DetalleMascotaActivity extends AppCompatActivity {
                         tvPatologia.setText("Patología: " + nombrePatologia);
                     } else {
                         tvPatologia.setText("Patología: Ninguna / Sano");
-                        tvPatologia.setTextColor(android.graphics.Color.parseColor("#2E7D32")); // Verde si está sano
                     }
                 }
             });
@@ -84,7 +96,7 @@ public class DetalleMascotaActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
-        finish(); // Vuelve a la pantalla anterior al pulsar la flecha de arriba
+        finish();
         return true;
     }
 }
