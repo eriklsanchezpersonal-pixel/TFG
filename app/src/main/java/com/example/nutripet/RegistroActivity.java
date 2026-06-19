@@ -15,7 +15,7 @@ public class RegistroActivity extends AppCompatActivity {
     private AppBaseDeDatos db;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) { // 🌟 ¡Arreglado aquí!
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro);
 

@@ -10,14 +10,14 @@ import java.util.List;
 @Dao
 public interface NutriPetDao {
 
-    // --- OPERACIONES PARA EL DUEÑO (LOGIN Y REGISTRO) ---
+    //OPERACIONES PARA EL DUEÑO (LOGIN Y REGISTRO)
     @Insert(onConflict = OnConflictStrategy.ABORT)
     long registrarDueno(Duenio dueno);
 
     @Query("SELECT * FROM Duenio WHERE email = :email AND contrasena = :contrasena LIMIT 1")
     Duenio login(String email, String contrasena);
 
-    // --- OPERACIONES PARA LAS MASCOTAS ---
+    //OPERACIONES PARA LAS MASCOTAS
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertarMascota(Mascota mascota);
 
@@ -55,11 +55,11 @@ public interface NutriPetDao {
     @Query("SELECT * FROM Mascota WHERE id_dueno = :idDuenio")
     List<Mascota> obtenerMascotasPorDuenio(int idDuenio);
 
-    //--- INSERTAR MASCOTA ---
+    // INSERTAR MASCOTA
     @Insert
     long registrarMascota(Mascota mascota);
 
-    //--- INSERTAR RELACIÓN MASCOTA-PATOLOGÍA ---
+    // INSERTAR RELACIÓN MASCOTA-PATOLOGÍA
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertarMascotaPatologia(MascotaPatologia mascotaPatologia);
 

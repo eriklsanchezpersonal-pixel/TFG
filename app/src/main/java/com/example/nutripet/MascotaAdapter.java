@@ -6,7 +6,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView; // 🌟 Importante para el ojo y el perro
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -104,7 +104,7 @@ public class MascotaAdapter extends RecyclerView.Adapter<MascotaAdapter.MascotaV
             tvMicrochip = itemView.findViewById(R.id.tvMicrochipItem);
             tvDatos = itemView.findViewById(R.id.tvDatosItem);
             ivPerro = itemView.findViewById(R.id.ivIconoPerro);
-            ivOjo = itemView.findViewById(R.id.ivInspeccionarOjo); // Enlazado aquí
+            ivOjo = itemView.findViewById(R.id.ivInspeccionarOjo);
         }
     }
 }

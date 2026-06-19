@@ -18,7 +18,7 @@ public class RecomendadorDietaActivity extends AppCompatActivity {
     private FloatingActionButton btnAtras;
     private AppBaseDeDatos db;
     private String patologiaMascota;
-    private String microchipMascota; // 🌟 Nuevo: para identificar a la mascota
+    private String microchipMascota;
     private List<String> ingredientesSeleccionados = new ArrayList<>();
 
     @Override
@@ -30,7 +30,7 @@ public class RecomendadorDietaActivity extends AppCompatActivity {
 
         // Recibir los datos
         patologiaMascota = getIntent().getStringExtra("PATOLOGIA_MASCOTA");
-        microchipMascota = getIntent().getStringExtra("MICROCHIP_MASCOTA"); // 🌟 Capturamos el microchip
+        microchipMascota = getIntent().getStringExtra("MICROCHIP_MASCOTA");
 
         contenedorIngredientes = findViewById(R.id.contenedorIngredientes);
         rvRecetas = findViewById(R.id.rvRecetasFiltradas);

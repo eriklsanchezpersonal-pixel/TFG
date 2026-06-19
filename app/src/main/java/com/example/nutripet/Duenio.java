@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey;
 
 @Entity(
         tableName = "Duenio",
-        indices = {@Index(value = {"email"}, unique = true)} // 🌟 Fuerza a que no haya correos idénticos
+        indices = {@Index(value = {"email"}, unique = true)}
 )public class Duenio {
     @PrimaryKey(autoGenerate = true)
     private int id_dueno;

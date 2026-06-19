@@ -21,7 +21,6 @@ import androidx.room.Index;
                         onDelete = ForeignKey.CASCADE
                 )
         },
-        // 🌟 Añadimos la coma que faltaba arriba y creamos los índices para ambas columnas
         indices = {
                 @Index(value = {"id_receta"}),
                 @Index(value = {"id_ingrediente"})
