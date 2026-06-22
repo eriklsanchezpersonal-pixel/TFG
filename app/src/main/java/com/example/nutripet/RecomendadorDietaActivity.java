@@ -76,13 +76,16 @@ public class RecomendadorDietaActivity extends AppCompatActivity {
 
     private void verificarAlertaMedica(String ingrediente) {
         new Thread(() -> {
-            // Le preguntamos a Room si existe un veto registrado para este ingrediente y esta patología
-            int prohibido = db.nutriPetDao().esIngredienteProhibido(ingrediente, patologiaMascota);
+            //Comprobamos si es prohibido para ESTA mascota en concreto
+            int prohibido = db.nutriPetDao().esIngredienteProhibidoParaMascota(microchipMascota, ingrediente);
 
             if (prohibido > 0) {
+                // Obtenemos el nombre de la patología específica que lo prohíbe
+                String nombrePatologia = db.nutriPetDao().obtenerNombrePatologiaConflicto(microchipMascota, ingrediente);
+
                 runOnUiThread(() -> {
                     mostrarAlertaCritica("Alerta Nutricional Crítica",
-                            "El ingrediente '" + ingrediente + "' está estrictamente contraindicado para animales con " + patologiaMascota + ".");
+                            "El ingrediente '" + ingrediente + "' está contraindicado por: " + (nombrePatologia != null ? nombrePatologia : "Patología médica detectada") + ".");
                 });
             }
         }).start();
@@ -102,8 +105,7 @@ public class RecomendadorDietaActivity extends AppCompatActivity {
     private void filtrarRecetas() {
         new Thread(() -> {
             if (ingredientesSeleccionados.isEmpty()) {
-                runOnUiThread(() -> rvRecetas.setAdapter(new RecetaAdapter(new ArrayList<>(), null)));
-                return;
+                runOnUiThread(() -> rvRecetas.setAdapter(new RecetaAdapter(new ArrayList<>(), null, false)));                return;
             }
 
             List<Receta> todasLasRecetas = db.nutriPetDao().obtenerTodasLasRecetas();
@@ -123,12 +125,13 @@ public class RecomendadorDietaActivity extends AppCompatActivity {
                 if (contieneAlMenosUno) recetasAptas.add(receta);
             }
 
-            // 🌟 ADAPTACIÓN PARA ASIGNACIÓN
             runOnUiThread(() -> {
+                // Pasamos true porque en esta pantalla SÍ queremos el botón de añadir "+"
                 RecetaAdapter adapter = new RecetaAdapter(recetasAptas, recetaSeleccionada -> {
-                    // Acción al hacer clic en una receta:
+                    // Acción al hacer clic en el botón '+' de la receta
                     asignarRecetaAMascota(recetaSeleccionada);
-                });
+                }, true);
+
                 rvRecetas.setAdapter(adapter);
             });
         }).start();

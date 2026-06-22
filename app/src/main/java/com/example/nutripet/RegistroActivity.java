@@ -43,6 +43,11 @@ public class RegistroActivity extends AppCompatActivity {
                 return;
             }
 
+            if (correo.length() < 6) {
+                etCorreo.setError("Correo demasiado corto");
+                return;
+            }
+
             if (!android.util.Patterns.EMAIL_ADDRESS.matcher(correo).matches()) {
                 etCorreo.setError("Introduce un correo electrónico válido (ejemplo@gmail.com)");
                 return;

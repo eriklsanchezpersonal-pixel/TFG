@@ -5,6 +5,8 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
+
 import java.util.List;
 
 @Dao
@@ -98,5 +100,43 @@ public interface NutriPetDao {
 
     @Query("SELECT * FROM Receta WHERE id_receta = :id")
     Receta obtenerRecetaPorId(int id);
+    @Query("SELECT P.* FROM Patologia P " +
+            "INNER JOIN Mascota_Patologia MP ON P.id_patologia = MP.id_patologia " +
+            "WHERE MP.id_mascota = :microchip")
+    List<Patologia> obtenerPatologiasDeMascota(String microchip);
+    @Query("SELECT COUNT(*) FROM Ingre_Prohibido IP " +
+            "INNER JOIN Mascota_Patologia MP ON IP.id_patologia = MP.id_patologia " +
+            "INNER JOIN Ingrediente I ON IP.id_ingrediente = I.id_ingrediente " +
+            "WHERE MP.id_mascota = :microchip " +
+            "AND LOWER(I.nombre) = LOWER(:nombreIngrediente)")
+    int esIngredienteProhibidoParaMascota(String microchip, String nombreIngrediente);
+
+    @Query("SELECT P.nombre_patologia FROM Patologia P " +
+            "INNER JOIN Ingre_Prohibido IP ON P.id_patologia = IP.id_patologia " +
+            "INNER JOIN Ingrediente I ON IP.id_ingrediente = I.id_ingrediente " +
+            "WHERE LOWER(I.nombre) = LOWER(:nombreIngrediente) " +
+            "AND P.id_patologia IN (SELECT id_patologia FROM Mascota_Patologia WHERE id_mascota = :microchip) LIMIT 1")
+    String obtenerNombrePatologiaConflicto(String microchip, String nombreIngrediente);
+
+    //Sentencias para modificado y borrado de mascota
+    @Update
+    void actualizarMascota(Mascota mascota);
+
+    @Query("DELETE FROM Mascota WHERE microchip = :microchip")
+    void borrarMascotaPorMicrochip(String microchip);
+
+    @Query("DELETE FROM Mascota_Patologia WHERE id_mascota = :microchip")
+    void borrarRelacionesPatologias(String microchip);
+
+    @Query("DELETE FROM Mascota_Receta WHERE id_mascota = :microchip")
+    void borrarRelacionesRecetas(String microchip);
+
+    // Obtiene los IDs de las patologías ya guardadas para una mascota específica
+    @Query("SELECT id_patologia FROM Mascota_Patologia WHERE id_mascota = :microchip")
+    List<Integer> obtenerIdsPatologiasDeMascota(String microchip);
+
+    // Borra todas las relaciones actuales antes de insertar las nuevas (útil al editar)
+    @Query("DELETE FROM Mascota_Patologia WHERE id_mascota = :microchip")
+    void borrarPatologiasDeMascota(String microchip);
 
 }

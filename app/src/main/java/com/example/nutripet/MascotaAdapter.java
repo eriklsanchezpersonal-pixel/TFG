@@ -34,25 +34,20 @@ public class MascotaAdapter extends RecyclerView.Adapter<MascotaAdapter.MascotaV
     public void onBindViewHolder(@NonNull MascotaViewHolder holder, int position) {
         Mascota mascota = listaMascotas.get(position);
 
-        //Calcular la edad exacta
         int edad = calcularEdad(mascota.getFecha_nacimiento());
-
-        //Inyectamos Nombre y Edad
         holder.tvNombre.setText(mascota.getNombre() + " (" + edad + " años)");
-
-        //Ocultamos el campo del microchip
         holder.tvMicrochip.setVisibility(View.GONE);
 
-        //Cargamos la patología con colores
-        String patologia = mascota.getNombrePatologia();
-        holder.tvDatos.setText("Patología: " + (patologia != null ? patologia : "Sano / Ninguna"));
 
-        if (patologia != null && (patologia.contains("Sano") || patologia.contains("Ninguna"))) {
+        String patologiasTexto = mascota.getNombrePatologia();
+
+        if (patologiasTexto == null || patologiasTexto.isEmpty() || patologiasTexto.equalsIgnoreCase("Sano")) {
+            holder.tvDatos.setText("Estado: Sano / Ninguna");
             holder.tvDatos.setTextColor(Color.parseColor("#2E7D32"));
         } else {
+            holder.tvDatos.setText("Patologías: " + patologiasTexto);
             holder.tvDatos.setTextColor(Color.parseColor("#D32F2F"));
         }
-
 
         holder.ivOjo.setOnClickListener(v -> {
             Intent intent = new Intent(context, DetalleMascotaActivity.class);
@@ -75,19 +70,10 @@ public class MascotaAdapter extends RecyclerView.Adapter<MascotaAdapter.MascotaV
         try {
             if (fechaNacimiento == null || fechaNacimiento.isEmpty()) return 0;
             String[] partes = fechaNacimiento.split("/");
-            int diaNac = Integer.parseInt(partes[0].trim());
-            int mesNac = Integer.parseInt(partes[1].trim());
             int anioNac = Integer.parseInt(partes[2].trim());
 
             Calendar hoy = Calendar.getInstance();
-            int anioActual = hoy.get(Calendar.YEAR);
-            int mesActual = hoy.get(Calendar.MONTH) + 1;
-            int diaActual = hoy.get(Calendar.DAY_OF_MONTH);
-
-            int edad = anioActual - anioNac;
-            if (mesActual < mesNac || (mesActual == mesNac && diaActual < diaNac)) {
-                edad--;
-            }
+            int edad = hoy.get(Calendar.YEAR) - anioNac;
             return Math.max(0, edad);
         } catch (Exception e) {
             return 0;

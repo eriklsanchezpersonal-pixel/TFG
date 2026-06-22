@@ -63,6 +63,9 @@ public abstract class AppBaseDeDatos extends RoomDatabase {
                 patologiasFijas.add(new Patologia("Insuficiencia Renal", 12.0f, 15.0f, 0.3f));   // ID: 2
                 patologiasFijas.add(new Patologia("Diabetes", 20.0f, 10.0f, 0.5f));              // ID: 3
                 patologiasFijas.add(new Patologia("Sin Patologías", 99.0f, 99.0f, 99.0f));       // ID: 4
+                patologiasFijas.add(new Patologia("Dermatitis", 50.0f, 20.0f, 0.4f));           // ID: 5
+                patologiasFijas.add(new Patologia("Artritis", 30.0f, 30.0f, 0.9f));            // ID: 6
+                patologiasFijas.add(new Patologia("Ansiedad", 40.0f, 25.0f, 0.6f));            // ID: 7
 
                 dao.precargarPatologias(patologiasFijas);
 
@@ -99,6 +102,12 @@ public abstract class AppBaseDeDatos extends RoomDatabase {
                 ingredientesFijos.add(new Ingrediente("Aceite de Oliva Virgen Extra", 884.0f, 0.0f, 100.0f, 0.0f)); // ID: 19
                 ingredientesFijos.add(new Ingrediente("Huevo Entero (cocido)", 155.0f, 13.0f, 11.0f, 0.18f));      // ID: 20
 
+                // --- NUEVOS INGREDIENTES (ID: 21 al 25) ---
+                ingredientesFijos.add(new Ingrediente("Cordero Magro", 260.0f, 25.0f, 17.0f, 0.20f));      // ID: 21
+                ingredientesFijos.add(new Ingrediente("Aceite de Coco", 890.0f, 0.0f, 100.0f, 0.0f));       // ID: 22
+                ingredientesFijos.add(new Ingrediente("Brócoli (cocido)", 35.0f, 2.8f, 0.4f, 0.03f));      // ID: 23
+                ingredientesFijos.add(new Ingrediente("Arándanos", 57.0f, 0.7f, 0.3f, 0.01f));             // ID: 24
+                ingredientesFijos.add(new Ingrediente("Ajo (Cantidades mínimas)", 149.0f, 6.4f, 0.5f, 0.02f)); // ID: 25
                 dao.precargarIngredientes(ingredientesFijos);
 
                 // =========================================================================
@@ -108,7 +117,9 @@ public abstract class AppBaseDeDatos extends RoomDatabase {
                 db.execSQL("INSERT INTO Ingre_Prohibido (id_ingrediente, id_patologia) VALUES (4, 2)");
                 db.execSQL("INSERT INTO Ingre_Prohibido (id_ingrediente, id_patologia) VALUES (7, 2)");
                 db.execSQL("INSERT INTO Ingre_Prohibido (id_ingrediente, id_patologia) VALUES (8, 3)");
-
+                db.execSQL("INSERT INTO Ingre_Prohibido (id_ingrediente, id_patologia) VALUES (22, 5)");
+                db.execSQL("INSERT INTO Ingre_Prohibido (id_ingrediente, id_patologia) VALUES (25, 6)");
+                db.execSQL("INSERT INTO Ingre_Prohibido (id_ingrediente, id_patologia) VALUES (25, 1)");
                 // =========================================================================
                 // PRECARGA DE RECETAS BASE (Tabla: Receta)
                 // =========================================================================
@@ -143,6 +154,11 @@ public abstract class AppBaseDeDatos extends RoomDatabase {
                 db.execSQL("INSERT INTO Receta (id_receta, nombre_receta, instrucciones, tiempo_preparacion, imagen_url) VALUES " +
                         "(9, 'Salmón con Avena y Zanahoria', 'Cocinar el salmón fresco a la plancha sin aceite. Mezclar con copos de avena previamente cocidos en agua y zanahoria al vapor.', 20, 'url_salmon_diabetes')");
 
+                db.execSQL("INSERT INTO Receta (id_receta, nombre_receta, instrucciones, tiempo_preparacion, imagen_url) VALUES " +
+                        "(10, 'Menú Anti-inflamatorio Cordero', 'Saltear el cordero magro con brócoli al vapor. Los arándanos aportan antioxidantes naturales.', 20, 'url_cordero_derm')");
+
+                db.execSQL("INSERT INTO Receta (id_receta, nombre_receta, instrucciones, tiempo_preparacion, imagen_url) VALUES " +
+                        "(11, 'Bowl de Pavo y Avena Relajante', 'Cocinar pavo suave con avena cocida. La avena ayuda a liberar serotonina.', 25, 'url_pavo_ansiedad')");
 
                 // =========================================================================
                 // COMPOSICIÓN NUTRICIONAL DE CADA RECETA (Tabla puente corregida: Receta_Ingrediente)
@@ -189,7 +205,22 @@ public abstract class AppBaseDeDatos extends RoomDatabase {
                 // Receta 9 (Salmón Diabetes - Diabetes)
                 db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (9, 5, 100.0)");
                 db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (9, 12, 80.0)");
-                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (9, 13, 60.0)");            });
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (9, 13, 60.0)");
+
+                // Receta 10
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (10, 21, 100.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (10, 23, 70.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (10, 24, 30.0)");
+
+                // Receta 11
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (11, 5, 100.0)"); // Pavo
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (11, 12, 90.0)"); // Avena
+
+
+
+
+
+            });
         }
     };
 }
