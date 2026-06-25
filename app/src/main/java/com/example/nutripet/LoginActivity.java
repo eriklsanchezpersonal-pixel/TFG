@@ -1,6 +1,7 @@
 package com.example.nutripet;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -55,6 +56,11 @@ public class LoginActivity extends AppCompatActivity {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 
                             //Pasamos el ID del dueño verificado de forma segura
+                            SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putInt("ID_USUARIO", duenio.getId_dueno());
+                            editor.apply();
+
                             intent.putExtra("ID_DUENIO", duenio.getId_dueno());
                             startActivity(intent);
 

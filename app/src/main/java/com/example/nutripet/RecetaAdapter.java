@@ -1,6 +1,7 @@
 package com.example.nutripet;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +17,16 @@ public class RecetaAdapter extends RecyclerView.Adapter<RecetaAdapter.RecetaView
     private final List<Receta> listaRecetas;
     private final OnRecetaClickListener listener;
     private final boolean esModoAsignacion;
-
+    private final boolean mostrarBotonEliminar;
     public interface OnRecetaClickListener {
-        void onRecetaClick(Receta receta);
+        void onRecetaClick(Receta receta, boolean esEliminar);
     }
 
-    public RecetaAdapter(List<Receta> listaRecetas, OnRecetaClickListener listener, boolean esModoAsignacion) {
+    public RecetaAdapter(List<Receta> listaRecetas, OnRecetaClickListener listener, boolean esModoAsignacion, boolean mostrarBotonEliminar) {
         this.listaRecetas = listaRecetas;
         this.listener = listener;
         this.esModoAsignacion = esModoAsignacion;
+        this.mostrarBotonEliminar = mostrarBotonEliminar;
     }
 
     @NonNull
@@ -40,21 +42,22 @@ public class RecetaAdapter extends RecyclerView.Adapter<RecetaAdapter.RecetaView
         holder.tvNombre.setText(receta.getNombre_receta());
         holder.tvTiempo.setText("Tiempo: " + receta.getTiempo_preparacion() + " min");
 
-        // Configuración botón Info
         holder.btnInfo.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), DetalleRecetaActivity.class);
             intent.putExtra("ID_RECETA", receta.getId_receta());
             v.getContext().startActivity(intent);
         });
 
-        // Configuración botón "+" (Solo visible en modo asignación)
         if (esModoAsignacion) {
             holder.btnAddReceta.setVisibility(View.VISIBLE);
-            holder.btnAddReceta.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onRecetaClick(receta);
-                }
-            });
+            holder.btnAddReceta.setImageResource(R.drawable.ic_add);
+            holder.btnAddReceta.setColorFilter(Color.parseColor("#2E7D32"));
+            holder.btnAddReceta.setOnClickListener(v -> listener.onRecetaClick(receta, false));
+        } else if (mostrarBotonEliminar) {
+            holder.btnAddReceta.setVisibility(View.VISIBLE);
+            holder.btnAddReceta.setImageResource(R.drawable.ic_remove);
+            holder.btnAddReceta.setColorFilter(Color.parseColor("#D32F2F"));
+            holder.btnAddReceta.setOnClickListener(v -> listener.onRecetaClick(receta, true));
         } else {
             holder.btnAddReceta.setVisibility(View.GONE);
         }

@@ -139,4 +139,28 @@ public interface NutriPetDao {
     @Query("DELETE FROM Mascota_Patologia WHERE id_mascota = :microchip")
     void borrarPatologiasDeMascota(String microchip);
 
+    @Query("DELETE FROM Mascota_Receta WHERE id_mascota = :microchip AND id_receta = :idReceta")
+    void eliminarRecetaDeMascota(String microchip, int idReceta);
+
+    @Insert
+    void insertarCita(CitaMedica cita);
+
+    //Obtener todas las citas de una mascota concreta.
+    @Query("SELECT * FROM citas_medicas WHERE microchipMascota = :microchip")
+    List<CitaMedica> obtenerCitasDeMascota(String microchip);
+
+    //Borrar la cita medica de una mascota
+    @Delete
+    void eliminarCita(CitaMedica cita);
+
+    // Obtener todas las citas (para vista global)
+    @Query("SELECT * FROM citas_medicas")
+    List<CitaMedica> obtenerTodasLasCitas();
+
+    // Obtener citas filtradas por mascota
+    @Query("SELECT * FROM citas_medicas WHERE microchipMascota = :microchip")
+    List<CitaMedica> obtenerCitasPorMascota(String microchip);
+
+    @Query("SELECT * FROM citas_medicas WHERE fecha = :fecha")
+    List<CitaMedica> obtenerCitasPorFecha(String fecha);
 }

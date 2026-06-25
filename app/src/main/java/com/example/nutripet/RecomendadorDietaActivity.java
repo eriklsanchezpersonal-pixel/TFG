@@ -105,7 +105,7 @@ public class RecomendadorDietaActivity extends AppCompatActivity {
     private void filtrarRecetas() {
         new Thread(() -> {
             if (ingredientesSeleccionados.isEmpty()) {
-                runOnUiThread(() -> rvRecetas.setAdapter(new RecetaAdapter(new ArrayList<>(), null, false)));                return;
+                runOnUiThread(() -> rvRecetas.setAdapter(new RecetaAdapter(new ArrayList<>(), null, false, false)));
             }
 
             List<Receta> todasLasRecetas = db.nutriPetDao().obtenerTodasLasRecetas();
@@ -127,10 +127,12 @@ public class RecomendadorDietaActivity extends AppCompatActivity {
 
             runOnUiThread(() -> {
                 // Pasamos true porque en esta pantalla SÍ queremos el botón de añadir "+"
-                RecetaAdapter adapter = new RecetaAdapter(recetasAptas, recetaSeleccionada -> {
-                    // Acción al hacer clic en el botón '+' de la receta
-                    asignarRecetaAMascota(recetaSeleccionada);
-                }, true);
+                RecetaAdapter adapter = new RecetaAdapter(recetasAptas, (recetaSeleccionada, esEliminar) -> {
+                    // Si no es eliminar (es decir, estamos en modo asignar '+'), realizamos la acción:
+                    if (!esEliminar) {
+                        asignarRecetaAMascota(recetaSeleccionada);
+                    }
+                }, true, false);
 
                 rvRecetas.setAdapter(adapter);
             });

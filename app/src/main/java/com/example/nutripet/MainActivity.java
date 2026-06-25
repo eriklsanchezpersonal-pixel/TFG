@@ -13,7 +13,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private FloatingActionButton fabAnadirMascota;
+    private FloatingActionButton fabAnadirMascota, fabCalendario;
     private RecyclerView rvMascotas;
     private FloatingActionButton fabPerfil;
     private TextView tvListaVacia;
@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         rvMascotas = findViewById(R.id.rvMascotas);
         tvListaVacia = findViewById(R.id.tvListaVacia);
         fabPerfil = findViewById(R.id.fabPerfil);
+        fabCalendario = findViewById(R.id.fabCalendario);
 
         // Configurar la orientación del RecyclerView
         rvMascotas.setLayoutManager(new LinearLayoutManager(this));
@@ -55,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
         fabPerfil.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, PerfilUsuarioActivity.class);
             intent.putExtra("ID_DUENIO", idDuenioLogueado);
+            startActivity(intent);
+        });
+
+        fabCalendario.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CalendarioCitasActivity.class);
             startActivity(intent);
         });
     }

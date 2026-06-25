@@ -100,10 +100,27 @@ public class DetalleMascotaActivity extends AppCompatActivity {
     private void cargarRecetasAsignadas() {
         new Thread(() -> {
             List<Receta> recetas = db.nutriPetDao().obtenerRecetasAsignadasAMascota(microchipMascota);
-            runOnUiThread(() -> rvRecetasAsignadas.setAdapter(new RecetaAdapter(recetas, null, false)));
+            runOnUiThread(() -> {
+                // false = No es modo añadir, true = Sí mostrar botón eliminar
+                RecetaAdapter adapter = new RecetaAdapter(recetas, (receta, esEliminar) -> {
+                    if (esEliminar) {
+                        eliminarRecetaDeMascota(receta);
+                    }
+                }, false, true);
+                rvRecetasAsignadas.setAdapter(adapter);
+            });
         }).start();
     }
-
+    private void eliminarRecetaDeMascota(Receta receta) {
+        new Thread(() -> {
+            // Asegúrate de tener este método en tu DAO
+            db.nutriPetDao().eliminarRecetaDeMascota(microchipMascota, receta.getId_receta());
+            runOnUiThread(() -> {
+                Toast.makeText(this, "Receta eliminada", Toast.LENGTH_SHORT).show();
+                cargarRecetasAsignadas(); // Refresca la lista
+            });
+        }).start();
+    }
     private void confirmarBorrado() {
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Eliminar Mascota")

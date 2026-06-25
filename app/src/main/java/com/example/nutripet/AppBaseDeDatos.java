@@ -21,7 +21,8 @@ import java.util.concurrent.Executors;
         MascotaPatologia.class,
         IngreProhibido.class,
         RecetaIngrediente.class,
-        MascotaReceta.class
+        MascotaReceta.class,
+        CitaMedica.class
 }, version = 1, exportSchema = false)
 public abstract class AppBaseDeDatos extends RoomDatabase {
 

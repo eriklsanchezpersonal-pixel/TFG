@@ -31,9 +31,11 @@
 
         <activity android:name=".RecomendadorDietaActivity" android:exported="false" />
 
-        <activity android:name=".DetalleRecetaActivity" />
+        <activity android:name=".DetalleRecetaActivity" android:exported="false" />
 
-        <activity android:name=".ModificarMascotaActivity" />
+        <activity android:name=".ModificarMascotaActivity" android:exported="false" />
+
+        <activity android:name=".CalendarioCitasActivity" android:exported="false" />
     </application>
 
 </manifest>
