@@ -17,7 +17,7 @@ Sigue estos pasos para tener el proyecto funcionando en tu entorno local:
 
 1.  **Clonar el repositorio**:
     ```bash
-    git clone [https://github.com/tu_usuario/tu_repositorio_nutripet.git](https://github.com/tu_usuario/tu_repositorio_nutripet.git)
+    git clone https://github.com/eriklsanchezpersonal-pixel/TFG.git
     ```
 
 2.  **Abrir en Android Studio**:
