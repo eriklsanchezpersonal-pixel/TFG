@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         fabCalendario.setOnClickListener(v -> {
             Intent intent = new Intent(this, CalendarioCitasActivity.class);
+            intent.putExtra("ID_DUENIO", idDuenioLogueado);
             startActivity(intent);
         });
     }

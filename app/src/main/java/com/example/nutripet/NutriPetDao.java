@@ -163,4 +163,17 @@ public interface NutriPetDao {
 
     @Query("SELECT * FROM citas_medicas WHERE fecha = :fecha")
     List<CitaMedica> obtenerCitasPorFecha(String fecha);
+
+    @Query("SELECT * FROM citas_medicas WHERE fecha = :fecha AND microchipMascota = :microchip")
+    List<CitaMedica> obtenerCitasPorFechaYMicrochip(String fecha, String microchip);
+
+    @Query("SELECT * FROM mascota WHERE nombre = :nombreMascota LIMIT 1")
+    Mascota obtenerMascotaPorNombre(String nombreMascota);
+
+    @Query("SELECT c.* FROM citas_medicas c INNER JOIN Mascota m ON c.microchipMascota = m.microchip WHERE c.fecha = :fecha AND m.id_dueno = :idDuenio")
+    List<CitaMedica> obtenerCitasPorFechaYDueno(String fecha, int idDuenio);
+
+    @Delete
+    void borrarCita(CitaMedica cita);
+
 }

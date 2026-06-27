@@ -56,8 +56,7 @@ public class LoginActivity extends AppCompatActivity {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 
                             //Pasamos el ID del dueño verificado de forma segura
-                            SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = prefs.edit();
+                            SharedPreferences prefs = getSharedPreferences("NutriPet_App_Prefs", MODE_PRIVATE);                            SharedPreferences.Editor editor = prefs.edit();
                             editor.putInt("ID_USUARIO", duenio.getId_dueno());
                             editor.apply();
 
