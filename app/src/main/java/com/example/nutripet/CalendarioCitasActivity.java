@@ -147,7 +147,6 @@ public class CalendarioCitasActivity extends AppCompatActivity implements CitaAd
         new Thread(() -> {
             List<Mascota> misMascotas = db.nutriPetDao().obtenerMascotasDeDueno(idDueno);
 
-            // DEBUG: Esto te dirá en el Logcat si el problema es que la lista llega vacía
             android.util.Log.d("DEBUG_MASCOTAS", "Mascotas encontradas para ID " + idDueno + ": " + misMascotas.size());
 
             List<String> nombres = new ArrayList<>();
@@ -274,10 +273,10 @@ public class CalendarioCitasActivity extends AppCompatActivity implements CitaAd
             //Borramos de la BD (Asegúrate de tener este @Delete en tu DAO)
             db.nutriPetDao().borrarCita(cita);
 
-            // 2. Recargamos la lista actualizada
+            // Recargamos la lista actualizada
             runOnUiThread(() -> {
                 Toast.makeText(this, "Cita eliminada", Toast.LENGTH_SHORT).show();
-                actualizarLista(); // Recarga llamando a tu método existente
+                actualizarLista();
             });
         }).start();
     }

@@ -45,16 +45,13 @@ public class ModificarMascotaActivity extends AppCompatActivity {
         etPeso = findViewById(R.id.etPesoMascota);
         spActividad = findViewById(R.id.spNivelActividad);
         btnGuardar = findViewById(R.id.btnGuardarMascota);
-        // Cambiar Título (si usas Toolbar con ID 'toolbarAlta' como en AltaMascota)
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbarAlta);
         if (toolbar != null) {
             toolbar.setTitle("Modificar Mascota");
         }
 
-        // Cambiar texto del botón
         btnGuardar.setText("MODIFICAR MASCOTA");
 
-        // Configura el adaptador ANTES de cargar los datos
         configurarSpinners();
 
         db = AppBaseDeDatos.getInstance(this);
@@ -69,13 +66,11 @@ public class ModificarMascotaActivity extends AppCompatActivity {
         btnSeleccionarPatologias.setOnClickListener(v -> mostrarDialogoPatologias());
         new Thread(() -> {
             listaPatologias = db.nutriPetDao().obtenerTodasLasPatologias();
-            // Obtener IDs de patologías de ESTA mascota (necesitas este método en tu DAO)
             List<Integer> idsActuales = db.nutriPetDao().obtenerIdsPatologiasDeMascota(microchipMascota);
             idsPatologiasSeleccionadas.addAll(idsActuales);
         }).start();
     }
     private void mostrarDatePicker() {
-        // Usamos el calendario actual como base
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
@@ -89,7 +84,6 @@ public class ModificarMascotaActivity extends AppCompatActivity {
 
         datePickerDialog.show();
     }
-    // Añade este método que ya tenías en tu AltaMascotaActivity
     private void configurarSpinners() {
         List<String> opcionesActividad = new ArrayList<>();
         opcionesActividad.add("Bajo (Poco ejercicio / Senior)");
@@ -131,7 +125,7 @@ public class ModificarMascotaActivity extends AppCompatActivity {
         String pesoStr = etPeso.getText().toString().trim();
         String actividad = spActividad.getSelectedItem().toString();
 
-        // 1. Validaciones básicas (lo que ya tenías)
+        //Validaciones básicas
         if (nombre.isEmpty() || fecha.isEmpty() || pesoStr.isEmpty()) {
             Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
             return;

@@ -36,7 +36,7 @@ public class CitaAdapter extends RecyclerView.Adapter<CitaAdapter.ViewHolder> {
         holder.tvTitulo.setText(cita.titulo);
         holder.tvFechaHora.setText("Fecha: " + cita.fecha + " | Hora: " + cita.hora);
 
-        // Acción de borrar
+        //Acción de borrar
         holder.btnBorrar.setOnClickListener(v -> listener.onBorrarClick(cita));
     }
 
@@ -53,7 +53,7 @@ public class CitaAdapter extends RecyclerView.Adapter<CitaAdapter.ViewHolder> {
             super(itemView);
             tvTitulo = itemView.findViewById(R.id.tvTitulo);
             tvFechaHora = itemView.findViewById(R.id.tvFechaHora);
-            btnBorrar = itemView.findViewById(R.id.btnBorrar); // Asegúrate de añadir este ID en XML
+            btnBorrar = itemView.findViewById(R.id.btnBorrar);
         }
     }
 

@@ -37,7 +37,7 @@ public class RegistroActivity extends AppCompatActivity {
             String correo = etCorreo.getText().toString().trim();
             String contrasena = etContrasena.getText().toString().trim();
 
-            // 1. Validaciones de formato en el hilo principal (Rápido)
+            // Validaciones de formato en el hilo principal (Rápido)
             if (nombre.isEmpty() || telefono.isEmpty() || correo.isEmpty() || contrasena.isEmpty()) {
                 Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show();
                 return;
@@ -66,7 +66,7 @@ public class RegistroActivity extends AppCompatActivity {
             // Crear el objeto Duenio
             Duenio nuevoDuenio = new Duenio(nombre, correo, telefono, contrasena);
 
-            // 2. Ejecutar la inserción en un hilo secundario
+            // Ejecutar la inserción en un hilo secundario
             new Thread(() -> {
                 try {
                     long idInsertado = db.nutriPetDao().registrarDueno(nuevoDuenio);

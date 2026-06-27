@@ -147,7 +147,7 @@ public class RecomendadorDietaActivity extends AppCompatActivity {
 
                 runOnUiThread(() -> {
                     Toast.makeText(this, "¡Receta '" + receta.getNombre_receta() + "' asignada!", Toast.LENGTH_SHORT).show();
-                    finish(); // Regresa al perfil de la mascota
+                    finish();
                 });
             }
         }).start();

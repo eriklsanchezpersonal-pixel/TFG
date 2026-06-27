@@ -68,7 +68,7 @@ public class RecetaAdapter extends RecyclerView.Adapter<RecetaAdapter.RecetaView
         return listaRecetas.size();
     }
 
-    // Método para refrescar la lista (Útil para el onResume)
+    // Metodo para refrescar la lista
     public void actualizarLista(List<Receta> nuevaLista) {
         this.listaRecetas.clear();
         this.listaRecetas.addAll(nuevaLista);
