@@ -2,6 +2,7 @@ package com.example.nutripet;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,8 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
+// Actividad que muestra la información detallada de una mascota y permite gestionar su dieta, modificarla o eliminarla
 public class DetalleMascotaActivity extends AppCompatActivity {
-
+    private static final String TAG = "DEBUG_DETALLE_MASCOTA";
     private TextView tvNombre, tvMicrochip, tvFecha, tvPeso, tvActividad, tvPatologia;
     private RecyclerView rvRecetasAsignadas;
     private Button btnVerDieta, btnModificar, btnBorrar;
@@ -30,8 +32,9 @@ public class DetalleMascotaActivity extends AppCompatActivity {
 
         db = AppBaseDeDatos.getInstance(this);
         microchipMascota = getIntent().getStringExtra("MICROCHIP_MASCOTA");
+        Log.d(TAG, "Iniciando DetalleMascotaActivity con microchip: " + microchipMascota);
 
-        // Vincular componentes
+        // Vincular componentes de la interfaz
         tvNombre = findViewById(R.id.tvDetalleNombre);
         tvMicrochip = findViewById(R.id.tvDetalleMicrochip);
         tvFecha = findViewById(R.id.tvDetalleFecha);
@@ -45,7 +48,9 @@ public class DetalleMascotaActivity extends AppCompatActivity {
         rvRecetasAsignadas = findViewById(R.id.rvRecetasAsignadas);
         rvRecetasAsignadas.setLayoutManager(new LinearLayoutManager(this));
 
+        // Configuración de listeners para navegación y acciones
         btnVerDieta.setOnClickListener(v -> {
+            Log.d(TAG, "Navegando a RecomendadorDietaActivity");
             Intent intent = new Intent(this, RecomendadorDietaActivity.class);
             intent.putExtra("MICROCHIP_MASCOTA", microchipMascota);
             intent.putExtra("PATOLOGIA_MASCOTA", tvPatologia.getText().toString());
@@ -53,6 +58,7 @@ public class DetalleMascotaActivity extends AppCompatActivity {
         });
 
         btnModificar.setOnClickListener(v -> {
+            Log.d(TAG, "Navegando a ModificarMascotaActivity");
             Intent intent = new Intent(this, ModificarMascotaActivity.class);
             intent.putExtra("MICROCHIP_MASCOTA", microchipMascota);
             startActivity(intent);
@@ -64,10 +70,12 @@ public class DetalleMascotaActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume: Recargando datos de la mascota");
         cargarDatosMascota();
         cargarRecetasAsignadas();
     }
 
+    // Consulta en segundo plano para obtener info básica y patologías
     private void cargarDatosMascota() {
         new Thread(() -> {
             Mascota mascota = db.nutriPetDao().obtenerMascotaPorMicrochip(microchipMascota);
@@ -75,6 +83,7 @@ public class DetalleMascotaActivity extends AppCompatActivity {
 
             runOnUiThread(() -> {
                 if (mascota != null) {
+                    Log.d(TAG, "Datos de mascota cargados: " + mascota.getNombre());
                     if (getSupportActionBar() != null) getSupportActionBar().setTitle("Perfil de " + mascota.getNombre());
                     tvNombre.setText("Nombre: " + mascota.getNombre());
                     tvMicrochip.setText("Microchip: " + mascota.getMicrochip());
@@ -97,11 +106,12 @@ public class DetalleMascotaActivity extends AppCompatActivity {
         }).start();
     }
 
+    // Consulta en segundo plano para obtener recetas asignadas
     private void cargarRecetasAsignadas() {
         new Thread(() -> {
             List<Receta> recetas = db.nutriPetDao().obtenerRecetasAsignadasAMascota(microchipMascota);
+            Log.d(TAG, "Recetas encontradas para la mascota: " + (recetas != null ? recetas.size() : 0));
             runOnUiThread(() -> {
-                // false = No es modo añadir, true = Sí mostrar botón eliminar
                 RecetaAdapter adapter = new RecetaAdapter(recetas, (receta, esEliminar) -> {
                     if (esEliminar) {
                         eliminarRecetaDeMascota(receta);
@@ -111,16 +121,19 @@ public class DetalleMascotaActivity extends AppCompatActivity {
             });
         }).start();
     }
+
+    // Proceso de eliminación de una receta específica asignada a la mascota
     private void eliminarRecetaDeMascota(Receta receta) {
         new Thread(() -> {
-            // Asegúrate de tener este método en tu DAO
+            Log.d(TAG, "Eliminando receta ID: " + receta.getId_receta());
             db.nutriPetDao().eliminarRecetaDeMascota(microchipMascota, receta.getId_receta());
             runOnUiThread(() -> {
                 Toast.makeText(this, "Receta eliminada", Toast.LENGTH_SHORT).show();
-                cargarRecetasAsignadas(); // Refresca la lista
+                cargarRecetasAsignadas();
             });
         }).start();
     }
+
     private void confirmarBorrado() {
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Eliminar Mascota")
@@ -130,11 +143,14 @@ public class DetalleMascotaActivity extends AppCompatActivity {
                 .show();
     }
 
+    // Proceso completo de eliminación de la mascota y sus relaciones
     private void borrarMascota() {
         new Thread(() -> {
+            Log.d(TAG, "Iniciando borrado total de la mascota: " + microchipMascota);
             db.nutriPetDao().borrarRelacionesPatologias(microchipMascota);
             db.nutriPetDao().borrarRelacionesRecetas(microchipMascota);
             db.nutriPetDao().borrarMascotaPorMicrochip(microchipMascota);
+            Log.d(TAG, "Mascota eliminada correctamente");
             runOnUiThread(this::finish);
         }).start();
     }

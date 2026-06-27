@@ -1,6 +1,7 @@
 package com.example.nutripet;
 
 import android.content.Context;
+import android.util.Log; // Importación necesaria para poder usar el Logcat
 import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
@@ -26,34 +27,42 @@ import java.util.concurrent.Executors;
 }, version = 1, exportSchema = false)
 public abstract class AppBaseDeDatos extends RoomDatabase {
 
+    // Instancia única global de la base de datos (Atributo del Patrón Singleton)
     private static AppBaseDeDatos INSTANCE;
 
+    // Metodo abstracto que Room implementa automáticamente para retornar el acceso a las consultas SQL
     public abstract NutriPetDao nutriPetDao();
 
+    // Metodo de acceso global estructurado bajo el Patrón Singleton con sincronización mutua de hilos
     public static AppBaseDeDatos getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppBaseDeDatos.class) {
                 if (INSTANCE == null) {
+                    Log.d("NUTRIPET_DB", "Instancia nula. Iniciando construcción de la base de datos...");
                     INSTANCE = Room.databaseBuilder(
                                     context.getApplicationContext(),
                                     AppBaseDeDatos.class,
                                     "nutripet_db"
                             )
-                            .allowMainThreadQueries()
-                            .addCallback(roomCallback)
+                            .allowMainThreadQueries() // Permite ejecuciones síncronas en el hilo de la UI para consultas rápidas
+                            .addCallback(roomCallback) // Vincula el callback que poblará la base de datos la primera vez
                             .build();
+                    Log.d("NUTRIPET_DB", "Base de datos construida con éxito.");
                 }
             }
         }
         return INSTANCE;
     }
 
+    // Callback encargado de capturar los eventos del ciclo de vida de la base de datos SQLite subyacente
     private static final RoomDatabase.Callback roomCallback = new RoomDatabase.Callback() {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
 
+            // Abre un ejecutor asíncrono aislado para no degradar el rendimiento de la interfaz al arrancar la app
             Executors.newSingleThreadExecutor().execute(() -> {
+                Log.d("NUTRIPET_DB", "Callback onCreate detectado. Iniciando precarga de datos estáticos...");
                 NutriPetDao dao = INSTANCE.nutriPetDao();
 
                 // =========================================================================
@@ -68,7 +77,9 @@ public abstract class AppBaseDeDatos extends RoomDatabase {
                 patologiasFijas.add(new Patologia("Artritis", 30.0f, 30.0f, 0.9f));            // ID: 6
                 patologiasFijas.add(new Patologia("Ansiedad", 40.0f, 25.0f, 0.6f));            // ID: 7
 
+                // Inserción masiva de los objetos del catálogo de condiciones clínicas
                 dao.precargarPatologias(patologiasFijas);
+                Log.d("NUTRIPET_DB", "Patologías fijas insertadas correctamente.");
 
                 // =========================================================================
                 // INICIALIZACIÓN DE INGREDIENTES (ID autogenerados de SQLite: 1 al 20)
@@ -109,11 +120,15 @@ public abstract class AppBaseDeDatos extends RoomDatabase {
                 ingredientesFijos.add(new Ingrediente("Brócoli (cocido)", 35.0f, 2.8f, 0.4f, 0.03f));      // ID: 23
                 ingredientesFijos.add(new Ingrediente("Arándanos", 57.0f, 0.7f, 0.3f, 0.01f));             // ID: 24
                 ingredientesFijos.add(new Ingrediente("Ajo (Cantidades mínimas)", 149.0f, 6.4f, 0.5f, 0.02f)); // ID: 25
+
+                // Inserción masiva de la lista total de alimentos en la tabla correspondiente
                 dao.precargarIngredientes(ingredientesFijos);
+                Log.d("NUTRIPET_DB", "Ingredientes fijos insertados correctamente.");
 
                 // =========================================================================
                 // ENLACE DE INGREDIENTES PROHIBIDOS POR ENFERMEDAD (Tabla: Ingre_Prohibido)
                 // =========================================================================
+                // Inserciones directas mediante SQL nativo para establecer restricciones médico-nutricionales
                 db.execSQL("INSERT INTO Ingre_Prohibido (id_ingrediente, id_patologia) VALUES (7, 1)");
                 db.execSQL("INSERT INTO Ingre_Prohibido (id_ingrediente, id_patologia) VALUES (4, 2)");
                 db.execSQL("INSERT INTO Ingre_Prohibido (id_ingrediente, id_patologia) VALUES (7, 2)");
@@ -121,6 +136,8 @@ public abstract class AppBaseDeDatos extends RoomDatabase {
                 db.execSQL("INSERT INTO Ingre_Prohibido (id_ingrediente, id_patologia) VALUES (22, 5)");
                 db.execSQL("INSERT INTO Ingre_Prohibido (id_ingrediente, id_patologia) VALUES (25, 6)");
                 db.execSQL("INSERT INTO Ingre_Prohibido (id_ingrediente, id_patologia) VALUES (25, 1)");
+                Log.d("NUTRIPET_DB", "Restricciones de ingredientes prohibidos cargadas.");
+
                 // =========================================================================
                 // PRECARGA DE RECETAS BASE (Tabla: Receta)
                 // =========================================================================
@@ -160,6 +177,7 @@ public abstract class AppBaseDeDatos extends RoomDatabase {
 
                 db.execSQL("INSERT INTO Receta (id_receta, nombre_receta, instrucciones, tiempo_preparacion, imagen_url) VALUES " +
                         "(11, 'Bowl de Pavo y Avena Relajante', 'Cocinar pavo suave con avena cocida. La avena ayuda a liberar serotonina.', 25, 'url_pavo_ansiedad')");
+                Log.d("NUTRIPET_DB", "Catálogo maestro de recetas base estructurado.");
 
                 // =========================================================================
                 // COMPOSICIÓN NUTRICIONAL DE CADA RECETA (Tabla puente corregida: Receta_Ingrediente)
@@ -214,12 +232,10 @@ public abstract class AppBaseDeDatos extends RoomDatabase {
                 db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (10, 24, 30.0)");
 
                 // Receta 11
-                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (11, 5, 100.0)"); // Pavo
-                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (11, 12, 90.0)"); // Avena
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (11, 5, 100.0)");
+                db.execSQL("INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad_gramos) VALUES (11, 12, 90.0)");
 
-
-
-
+                Log.d("NUTRIPET_DB", "Composición de ingredientes por receta completada.¡Base de datos lista para operar!");
 
             });
         }

@@ -2,6 +2,8 @@ package com.example.nutripet;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,11 +13,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
+// Pantalla principal: muestra la lista de mascotas registradas por el usuario logueado
 public class MainActivity extends AppCompatActivity {
-
-    private FloatingActionButton fabAnadirMascota, fabCalendario;
+    private static final String TAG = "DEBUG_MAIN_ACTIVITY";
+    private FloatingActionButton fabAnadirMascota, fabCalendario, fabPerfil;
     private RecyclerView rvMascotas;
-    private FloatingActionButton fabPerfil;
     private TextView tvListaVacia;
     private MascotaAdapter mascotaAdapter;
     private AppBaseDeDatos db;
@@ -26,13 +28,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Inicializamos el acceso a la base de datos de Room
+        // Inicializamos la base de datos de Room
         db = AppBaseDeDatos.getInstance(this);
 
-        //Recuperamos el ID del dueño enviado desde el LoginActivity
+        // Recuperamos el ID del dueño enviado desde el LoginActivity
         idDuenioLogueado = getIntent().getIntExtra("ID_DUENIO", -1);
+        Log.d(TAG, "MainActivity inicializada con ID_DUENIO: " + idDuenioLogueado);
 
-        //Vinculamos componentes del layout
+        // Vinculamos componentes del layout
         fabAnadirMascota = findViewById(R.id.fabAnadirMascota);
         rvMascotas = findViewById(R.id.rvMascotas);
         tvListaVacia = findViewById(R.id.tvListaVacia);
@@ -42,24 +45,27 @@ public class MainActivity extends AppCompatActivity {
         // Configurar la orientación del RecyclerView
         rvMascotas.setLayoutManager(new LinearLayoutManager(this));
 
-        //Inicializamos el adaptador pasándole la lista vacía y el contexto (this)
+        // Inicializamos el adaptador
         mascotaAdapter = new MascotaAdapter(new ArrayList<>(), this);
         rvMascotas.setAdapter(mascotaAdapter);
 
-        //Configuramos la acción del botón "+"
+        // Configuración de los botones de navegación
         fabAnadirMascota.setOnClickListener(v -> {
+            Log.d(TAG, "Navegando a AltaMascotaActivity");
             Intent intent = new Intent(MainActivity.this, AltaMascotaActivity.class);
             intent.putExtra("ID_DUENIO", idDuenioLogueado);
             startActivity(intent);
         });
 
         fabPerfil.setOnClickListener(v -> {
+            Log.d(TAG, "Navegando a PerfilUsuarioActivity");
             Intent intent = new Intent(MainActivity.this, PerfilUsuarioActivity.class);
             intent.putExtra("ID_DUENIO", idDuenioLogueado);
             startActivity(intent);
         });
 
         fabCalendario.setOnClickListener(v -> {
+            Log.d(TAG, "Navegando a CalendarioCitasActivity");
             Intent intent = new Intent(this, CalendarioCitasActivity.class);
             intent.putExtra("ID_DUENIO", idDuenioLogueado);
             startActivity(intent);
@@ -69,25 +75,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume: Recargando lista de mascotas");
         if (idDuenioLogueado != -1) {
             cargarMascotasDesdeBD();
         } else {
             Toast.makeText(this, "Error: Sesión de usuario no válida", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error: ID_DUENIO es -1 en onResume");
         }
     }
 
+    // Consulta en segundo plano para obtener mascotas y sus patologías asociadas
     private void cargarMascotasDesdeBD() {
         new Thread(() -> {
             try {
-                //Obtenemos la lista de mascotas del dueño
+                Log.d(TAG, "Consultando mascotas para dueño: " + idDuenioLogueado);
                 final List<Mascota> listaActualizada = db.nutriPetDao().obtenerMascotasPorDuenio(idDuenioLogueado);
 
                 if (listaActualizada != null) {
                     for (Mascota m : listaActualizada) {
-                        // Obtenemos la LISTA de patologías, no una sola
                         List<Patologia> listaPats = db.nutriPetDao().obtenerPatologiasDeMascota(m.getMicrochip());
 
-                        // Concatenamos los nombres de las patologías
                         StringBuilder sb = new StringBuilder();
                         if (listaPats != null && !listaPats.isEmpty()) {
                             for (int i = 0; i < listaPats.size(); i++) {
@@ -99,19 +106,22 @@ public class MainActivity extends AppCompatActivity {
                             m.setNombrePatologia("Sano / Ninguna");
                         }
                     }
+                    Log.d(TAG, "Mascotas procesadas: " + listaActualizada.size());
                 }
 
-                //Actualizamos el adaptador en el hilo principal
+                // Actualizamos la UI en el hilo principal
                 runOnUiThread(() -> {
                     if (listaActualizada != null && !listaActualizada.isEmpty()) {
-                        tvListaVacia.setVisibility(android.view.View.GONE);
+                        tvListaVacia.setVisibility(View.GONE);
                         mascotaAdapter.updateList(listaActualizada);
                     } else {
-                        tvListaVacia.setVisibility(android.view.View.VISIBLE);
+                        Log.d(TAG, "No hay mascotas para mostrar");
+                        tvListaVacia.setVisibility(View.VISIBLE);
                         mascotaAdapter.updateList(new ArrayList<>());
                     }
                 });
             } catch (Exception e) {
+                Log.e(TAG, "Error al cargar mascotas: " + e.getMessage());
                 e.printStackTrace();
             }
         }).start();

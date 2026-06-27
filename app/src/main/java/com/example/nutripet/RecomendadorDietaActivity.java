@@ -1,23 +1,27 @@
 package com.example.nutripet;
-import android.widget.LinearLayout;
-import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import android.widget.CheckBox;
+
 import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
+
+// Actividad: Recomendador de dietas basado en ingredientes y patologías
 public class RecomendadorDietaActivity extends AppCompatActivity {
+    private static final String TAG = "DEBUG_RECOMENDADOR";
 
     private LinearLayout contenedorIngredientes;
     private RecyclerView rvRecetas;
     private FloatingActionButton btnAtras;
     private AppBaseDeDatos db;
-    private String patologiaMascota;
     private String microchipMascota;
     private List<String> ingredientesSeleccionados = new ArrayList<>();
 
@@ -27,10 +31,8 @@ public class RecomendadorDietaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recomendar_dieta);
 
         db = AppBaseDeDatos.getInstance(this);
-
-        // Recibir los datos
-        patologiaMascota = getIntent().getStringExtra("PATOLOGIA_MASCOTA");
         microchipMascota = getIntent().getStringExtra("MICROCHIP_MASCOTA");
+        Log.d(TAG, "Recomendador iniciado para Mascota: " + microchipMascota);
 
         contenedorIngredientes = findViewById(R.id.contenedorIngredientes);
         rvRecetas = findViewById(R.id.rvRecetasFiltradas);
@@ -45,29 +47,20 @@ public class RecomendadorDietaActivity extends AppCompatActivity {
     private void cargarIngredientes() {
         new Thread(() -> {
             List<Ingrediente> listaIngredientes = db.nutriPetDao().obtenerTodosLosIngredientes();
-
             runOnUiThread(() -> {
                 for (Ingrediente ing : listaIngredientes) {
                     CheckBox cb = new CheckBox(this);
                     cb.setText(ing.getNombre());
-                    cb.setTextSize(16);
-
-                    //Listener en tiempo real cada vez que marcas/desmarcas un ingrediente
                     cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                        String nombreIngrediente = ing.getNombre().toLowerCase();
-
+                        String nombreIng = ing.getNombre().toLowerCase();
                         if (isChecked) {
-                            ingredientesSeleccionados.add(nombreIngrediente);
-                            //COMPROBACIÓN MÉDICA VETERINARIA
-                            verificarAlertaMedica(nombreIngrediente);
+                            ingredientesSeleccionados.add(nombreIng);
+                            verificarAlertaMedica(nombreIng);
                         } else {
-                            ingredientesSeleccionados.remove(nombreIngrediente);
+                            ingredientesSeleccionados.remove(nombreIng);
                         }
-
-                        //Filtrar recetas basándose en la lista actualizada
                         filtrarRecetas();
                     });
-
                     contenedorIngredientes.addView(cb);
                 }
             });
@@ -76,80 +69,50 @@ public class RecomendadorDietaActivity extends AppCompatActivity {
 
     private void verificarAlertaMedica(String ingrediente) {
         new Thread(() -> {
-            //Comprobamos si es prohibido para ESTA mascota en concreto
             int prohibido = db.nutriPetDao().esIngredienteProhibidoParaMascota(microchipMascota, ingrediente);
-
             if (prohibido > 0) {
-                // Obtenemos el nombre de la patología específica que lo prohíbe
-                String nombrePatologia = db.nutriPetDao().obtenerNombrePatologiaConflicto(microchipMascota, ingrediente);
-
-                runOnUiThread(() -> {
-                    mostrarAlertaCritica("Alerta Nutricional Crítica",
-                            "El ingrediente '" + ingrediente + "' está contraindicado por: " + (nombrePatologia != null ? nombrePatologia : "Patología médica detectada") + ".");
-                });
+                String patologia = db.nutriPetDao().obtenerNombrePatologiaConflicto(microchipMascota, ingrediente);
+                Log.w(TAG, "Alerta: Ingrediente prohibido seleccionado: " + ingrediente);
+                runOnUiThread(() -> mostrarAlertaCritica("Alerta Nutricional", "El ingrediente '" + ingrediente + "' es peligroso para la patología: " + patologia));
             }
         }).start();
     }
 
-    private void mostrarAlertaCritica(String titulo, String mensaje) {
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("⚠️ " + titulo)
-                .setMessage(mensaje)
-                .setPositiveButton("COMPRENDO EL RIESGO", null)
-                .show();
-
-        //Ponemos el botón en un color rojo de advertencia
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
-    }
-
     private void filtrarRecetas() {
         new Thread(() -> {
-            if (ingredientesSeleccionados.isEmpty()) {
-                runOnUiThread(() -> rvRecetas.setAdapter(new RecetaAdapter(new ArrayList<>(), null, false, false)));
-            }
-
             List<Receta> todasLasRecetas = db.nutriPetDao().obtenerTodasLasRecetas();
             List<Receta> recetasAptas = new ArrayList<>();
 
             for (Receta receta : todasLasRecetas) {
-                List<String> ingredientesDeEstaReceta = db.nutriPetDao().obtenerIngredientesDeReceta(receta.getId_receta());
-                boolean contieneAlMenosUno = false;
-                if (ingredientesDeEstaReceta != null) {
-                    for (String ing : ingredientesDeEstaReceta) {
+                List<String> ings = db.nutriPetDao().obtenerIngredientesDeReceta(receta.getId_receta());
+                // Lógica de filtrado: si la receta contiene algún ingrediente seleccionado
+                if (ings != null) {
+                    for (String ing : ings) {
                         if (ingredientesSeleccionados.contains(ing.toLowerCase().trim())) {
-                            contieneAlMenosUno = true;
+                            recetasAptas.add(receta);
                             break;
                         }
                     }
                 }
-                if (contieneAlMenosUno) recetasAptas.add(receta);
             }
-
-            runOnUiThread(() -> {
-                // Pasamos true porque en esta pantalla SÍ queremos el botón de añadir "+"
-                RecetaAdapter adapter = new RecetaAdapter(recetasAptas, (recetaSeleccionada, esEliminar) -> {
-                    // Si no es eliminar (es decir, estamos en modo asignar '+'), realizamos la acción:
-                    if (!esEliminar) {
-                        asignarRecetaAMascota(recetaSeleccionada);
-                    }
-                }, true, false);
-
-                rvRecetas.setAdapter(adapter);
-            });
+            Log.d(TAG, "Recetas encontradas tras filtrado: " + recetasAptas.size());
+            runOnUiThread(() -> rvRecetas.setAdapter(new RecetaAdapter(recetasAptas, (r, e) -> asignarRecetaAMascota(r), true, false)));
         }).start();
     }
 
     private void asignarRecetaAMascota(Receta receta) {
         new Thread(() -> {
-            if (microchipMascota != null) {
-                MascotaReceta mr = new MascotaReceta(microchipMascota, receta.getId_receta());
-                db.nutriPetDao().asignarRecetaAMascota(mr);
-
-                runOnUiThread(() -> {
-                    Toast.makeText(this, "¡Receta '" + receta.getNombre_receta() + "' asignada!", Toast.LENGTH_SHORT).show();
-                    finish();
-                });
-            }
+            db.nutriPetDao().asignarRecetaAMascota(new MascotaReceta(microchipMascota, receta.getId_receta()));
+            runOnUiThread(() -> {
+                Toast.makeText(this, "Receta '" + receta.getNombre_receta() + "' asignada", Toast.LENGTH_SHORT).show();
+                finish();
+            });
         }).start();
+    }
+
+    private void mostrarAlertaCritica(String titulo, String mensaje) {
+        new AlertDialog.Builder(this).setTitle("⚠️ " + titulo).setMessage(mensaje)
+                .setPositiveButton("COMPRENDO EL RIESGO", null).show()
+                .getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
     }
 }
