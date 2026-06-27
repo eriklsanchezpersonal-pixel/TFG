@@ -11,7 +11,7 @@ Para poder compilar y ejecutar este proyecto, necesitas:
 3.  **SDK de Android**: Nivel de API 26 (Android 8.0) como mínimo.
 4.  Un dispositivo físico o emulador con **Android 8.0+**.
 
-## 🛠 Instalación
+## Instalación
 
 Sigue estos pasos para tener el proyecto funcionando en tu entorno local:
 
@@ -34,14 +34,14 @@ Sigue estos pasos para tener el proyecto funcionando en tu entorno local:
     * Selecciona un emulador o conecta tu dispositivo físico vía USB.
     * Presiona el botón **Run** (ícono de "Play" verde) en la barra de herramientas superior.
 
-## 📱 Funcionalidades principales
+## Funcionalidades principales
 
 * **Registro y Login**: Gestión de usuarios basada en persistencia local.
 * **Gestión de Mascotas**: Alta, edición y seguimiento de datos biométricos.
 * **Recomendador Nutricional**: Filtro inteligente de recetas basado en los ingredientes seleccionados y las patologías de la mascota.
 * **Control de Citas**: Calendario integrado para el seguimiento médico.
 
-## ⚙️ Tecnologías utilizadas
+## Tecnologías utilizadas
 
 * **Lenguaje**: Java
 * **Persistencia**: Room Database (ORM)
