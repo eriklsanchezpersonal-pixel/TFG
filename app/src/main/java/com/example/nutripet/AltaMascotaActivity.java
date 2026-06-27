@@ -10,6 +10,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.List;
+import android.app.DatePickerDialog;
+import java.util.Calendar;
 
 public class AltaMascotaActivity extends AppCompatActivity {
 
@@ -39,6 +41,8 @@ public class AltaMascotaActivity extends AppCompatActivity {
         etMicrochip = findViewById(R.id.etMicrochipMascota);
         etNombre = findViewById(R.id.etNombreMascota);
         etFechaNacimiento = findViewById(R.id.etFechaNacimientoMascota);
+        etFechaNacimiento.setFocusable(false);
+        etFechaNacimiento.setOnClickListener(v -> mostrarDatePicker());
         etPeso = findViewById(R.id.etPesoMascota);
         spNivelActividad = findViewById(R.id.spNivelActividad);
         btnGuardar = findViewById(R.id.btnGuardarMascota);
@@ -47,7 +51,7 @@ public class AltaMascotaActivity extends AppCompatActivity {
         configurarSpinners();
 
         toolbar = findViewById(R.id.toolbarAlta);
-        toolbar.setTitle("Registrar Mascota"); // Asegura que este sea el texto
+        toolbar.setTitle("Registrar Mascota");
         btnGuardar.setText("REGISTRAR MASCOTA");
 
         btnSeleccionarPatologias.setOnClickListener(v -> mostrarDialogoPatologias());
@@ -56,7 +60,19 @@ public class AltaMascotaActivity extends AppCompatActivity {
         // Cargar patologías en segundo plano
         new Thread(() -> listaPatologias = db.nutriPetDao().obtenerTodasLasPatologias()).start();
     }
+    private void mostrarDatePicker() {
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
 
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year1, monthOfYear, dayOfMonth) -> {
+            String fechaFormateada = String.format("%02d/%02d/%d", dayOfMonth, monthOfYear + 1, year1);
+            etFechaNacimiento.setText(fechaFormateada);
+        }, year, month, day);
+
+        datePickerDialog.show();
+    }
     private void configurarSpinners() {
         List<String> opcionesActividad = new ArrayList<>();
         opcionesActividad.add("Bajo (Poco ejercicio / Senior)");

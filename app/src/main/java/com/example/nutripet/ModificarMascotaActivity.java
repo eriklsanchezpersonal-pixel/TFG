@@ -13,9 +13,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import android.app.DatePickerDialog;
+import java.util.Calendar;
+
 public class ModificarMascotaActivity extends AppCompatActivity {
 
-    // Variables que coinciden exactamente con tu XML
     private EditText etMicrochip, etNombre, etFecha, etPeso;
     private Spinner spActividad;
     private Button btnGuardar;
@@ -32,10 +35,13 @@ public class ModificarMascotaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.actividad_alta_mascota);
 
-        // 1. Vincular componentes
+        // Vincular componentes
         etMicrochip = findViewById(R.id.etMicrochipMascota);
         etNombre = findViewById(R.id.etNombreMascota);
         etFecha = findViewById(R.id.etFechaNacimientoMascota);
+        etFecha.setFocusable(false);
+        etFecha.setClickable(true);
+        etFecha.setOnClickListener(v -> mostrarDatePicker());
         etPeso = findViewById(R.id.etPesoMascota);
         spActividad = findViewById(R.id.spNivelActividad);
         btnGuardar = findViewById(R.id.btnGuardarMascota);
@@ -51,7 +57,6 @@ public class ModificarMascotaActivity extends AppCompatActivity {
         // Configura el adaptador ANTES de cargar los datos
         configurarSpinners();
 
-        // 3. El resto de tu código
         db = AppBaseDeDatos.getInstance(this);
         microchipMascota = getIntent().getStringExtra("MICROCHIP_MASCOTA");
 
@@ -69,7 +74,21 @@ public class ModificarMascotaActivity extends AppCompatActivity {
             idsPatologiasSeleccionadas.addAll(idsActuales);
         }).start();
     }
+    private void mostrarDatePicker() {
+        // Usamos el calendario actual como base
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
 
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year1, monthOfYear, dayOfMonth) -> {
+            // Formato estricto dd/mm/aaaa
+            String fechaFormateada = String.format("%02d/%02d/%d", dayOfMonth, monthOfYear + 1, year1);
+            etFecha.setText(fechaFormateada);
+        }, year, month, day);
+
+        datePickerDialog.show();
+    }
     // Añade este método que ya tenías en tu AltaMascotaActivity
     private void configurarSpinners() {
         List<String> opcionesActividad = new ArrayList<>();
@@ -135,7 +154,6 @@ public class ModificarMascotaActivity extends AppCompatActivity {
             return;
         }
 
-        // Ejecutar la actualización en un hilo secundario
         Mascota mActualizada = new Mascota(microchipMascota, nombre, fecha, peso, actividad, idDuenioActual);
 
         new Thread(() -> {
